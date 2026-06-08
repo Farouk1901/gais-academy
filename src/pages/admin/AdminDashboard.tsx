@@ -9,8 +9,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import {
-  Users, BookOpen, CreditCard, TrendingUp, Clock, CheckCircle,
-  XCircle, AlertCircle, GraduationCap, Award, Layers, ArrowLeft
+  BookOpen, TrendingUp, Clock, CheckCircle,
+  XCircle, GraduationCap, Layers, ArrowLeft, MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AdminLayout from '@/components/layouts/AdminLayout';
@@ -34,6 +34,7 @@ interface DashboardStats {
   monthRevenue: number;
   totalCertificates: number;
   openTickets: number;
+  unreadMessages: number;
 }
 
 interface RecentPayment {
@@ -136,6 +137,7 @@ export default function AdminDashboard() {
         coursesRes, publishedCoursesRes, draftCoursesRes,
         subsRes, subStatusRes, paymentsRes, payStatusRes,
         certificatesRes, ticketsRes, recentPayRes, recentSubRes,
+        unreadMessagesRes,
       ] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'user'),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'user').gte('created_at', today.toISOString()),
@@ -151,6 +153,7 @@ export default function AdminDashboard() {
         supabase.from('support_tickets').select('id', { count: 'exact', head: true }).eq('status', 'open'),
         supabase.from('payments').select('id, amount, status, payment_method, created_at, profiles!student_id(full_name), courses!course_id(title_ar)').order('created_at', { ascending: false }).limit(5),
         supabase.from('subscriptions').select('id, status, created_at, profiles!student_id(full_name), courses!course_id(title_ar)').order('created_at', { ascending: false }).limit(5),
+        supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('is_read', false),
       ]);
 
       // Compute revenue stats
@@ -247,6 +250,7 @@ export default function AdminDashboard() {
         monthRevenue,
         totalCertificates: certificatesRes.count || 0,
         openTickets: ticketsRes.count || 0,
+        unreadMessages: unreadMessagesRes.count || 0,
       });
 
       setRecentPayments((recentPayRes.data || []) as unknown as RecentPayment[]);
@@ -285,7 +289,9 @@ export default function AdminDashboard() {
         <StatCard title="مدفوعات معلقة" value={stats?.pendingPayments ?? 0} icon={Clock} color="bg-warning/10 text-warning" loading={loading} />
         <StatCard title="مدفوعات مقبولة" value={stats?.approvedPayments ?? 0} icon={CheckCircle} color="bg-success/10 text-success" loading={loading} />
         <StatCard title="مدفوعات مرفوضة" value={stats?.rejectedPayments ?? 0} icon={XCircle} color="bg-destructive/10 text-destructive" loading={loading} />
-        <StatCard title="تذاكر دعم مفتوحة" value={stats?.openTickets ?? 0} icon={AlertCircle} color="bg-info/10 text-info" loading={loading} />
+        <Link to="/admin/contact-messages" className="block">
+          <StatCard title="رسائل غير مقروءة" value={stats?.unreadMessages ?? 0} icon={MessageSquare} color="bg-primary/10 text-primary" sub="رسائل التواصل" loading={loading} />
+        </Link>
       </div>
 
       {/* Charts Row */}
@@ -301,18 +307,18 @@ export default function AdminDashboard() {
                 <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(210,100%,56%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(210,100%,56%)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(221,83%,53%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(221,83%,53%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222,30%,13%)" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(215,18%,48%)' }} />
-                  <YAxis tick={{ fontSize: 10, fill: 'hsl(215,18%,48%)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(220,9%,46%)' }} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(220,9%,46%)' }} />
                   <Tooltip
-                    contentStyle={{ background: 'hsl(222,44%,6.5%)', border: '1px solid hsl(222,30%,13%)', borderRadius: '8px', fontSize: '12px' }}
+                    contentStyle={{ background: '#ffffff', border: '1px solid hsl(220,13%,91%)', color: '#111827', borderRadius: '8px', fontSize: '12px' }}
                     formatter={(val: number) => [`${val.toLocaleString('ar-EG')} ج.م`, 'الإيراد']}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="hsl(210,100%,56%)" fill="url(#revenueGrad)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="revenue" stroke="hsl(221,83%,53%)" fill="url(#revenueGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -328,14 +334,14 @@ export default function AdminDashboard() {
             {loading ? <Skeleton className="h-48 w-full bg-muted" /> : (
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={monthlyRevenue} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222,30%,13%)" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(215,18%,48%)' }} />
-                  <YAxis tick={{ fontSize: 10, fill: 'hsl(215,18%,48%)' }} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'hsl(220,9%,46%)' }} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(220,9%,46%)' }} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ background: 'hsl(222,44%,6.5%)', border: '1px solid hsl(222,30%,13%)', borderRadius: '8px', fontSize: '12px' }}
+                    contentStyle={{ background: '#ffffff', border: '1px solid hsl(220,13%,91%)', color: '#111827', borderRadius: '8px', fontSize: '12px' }}
                     formatter={(val: number) => [val, 'طالب جديد']}
                   />
-                  <Bar dataKey="students" fill="hsl(186,100%,48%)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="students" fill="hsl(199,89%,48%)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -360,7 +366,7 @@ export default function AdminDashboard() {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ background: 'hsl(222,44%,6.5%)', border: '1px solid hsl(222,30%,13%)', borderRadius: '8px', fontSize: '12px' }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid hsl(220,13%,91%)', color: '#111827', borderRadius: '8px', fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -382,7 +388,7 @@ export default function AdminDashboard() {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ background: 'hsl(222,44%,6.5%)', border: '1px solid hsl(222,30%,13%)', borderRadius: '8px', fontSize: '12px' }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid hsl(220,13%,91%)', color: '#111827', borderRadius: '8px', fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}

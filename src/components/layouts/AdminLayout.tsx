@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Users, BookOpen, Video, CreditCard, Bell,
   Tag, Award, HeadphonesIcon, BarChart3, Settings, LogOut,
   Menu, GraduationCap, Shield, FileText, BookMarked, ChevronDown, ChevronRight,
-  Layers, Crown
+  Layers, Crown, MessageSquare
 } from 'lucide-react';
 
 interface NavGroup {
@@ -62,6 +62,7 @@ const navGroups: NavGroup[] = [
     items: [
       { label: 'الشهادات', path: '/admin/certificates', icon: Award },
       { label: 'الإشعارات', path: '/admin/notifications', icon: Bell },
+      { label: 'رسائل التواصل', path: '/admin/contact-messages', icon: MessageSquare },
       { label: 'الدعم الفني', path: '/admin/support', icon: HeadphonesIcon },
     ],
   },

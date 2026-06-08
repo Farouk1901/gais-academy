@@ -104,8 +104,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profileData = await getProfile(userId);
       setProfile(profileData);
       if (profileData) await loadPermissions(userId, profileData.role);
-    } catch {
-      setProfile(null);
+    } catch (err) {
+      // Do NOT clear profile on refresh errors — a network hiccup during
+      // TOKEN_REFRESHED should not silently log admins/users out.
+      // Only log the error for debugging.
+      console.warn('loadUserProfile error (profile preserved):', err);
     } finally {
       setProfileLoaded(true);
     }

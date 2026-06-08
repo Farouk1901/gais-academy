@@ -53,6 +53,7 @@ import AdminSupportPage from './pages/admin/AdminSupportPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminActivityLogsPage from './pages/admin/AdminActivityLogsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminContactMessagesPage from './pages/admin/AdminContactMessagesPage';
 
 export interface RouteConfig {
   name: string;
@@ -158,6 +159,7 @@ export const routes: RouteConfig[] = [
   { name: 'Admin Coupons', path: '/admin/coupons', element: <RouteGuard requireAdmin><AdminCouponsPage /></RouteGuard> },
   { name: 'Admin Certificates', path: '/admin/certificates', element: <RouteGuard requireAdmin><AdminCertificatesPage /></RouteGuard> },
   { name: 'Admin Notifications', path: '/admin/notifications', element: <RouteGuard requireAdmin><AdminNotificationsPage /></RouteGuard> },
+  { name: 'Admin Contact Messages', path: '/admin/contact-messages', element: <RouteGuard requireAdmin><AdminContactMessagesPage /></RouteGuard> },
   { name: 'Admin Support', path: '/admin/support', element: <RouteGuard requireAdmin><AdminSupportPage /></RouteGuard> },
   { name: 'Admin Analytics', path: '/admin/analytics', element: <RouteGuard requireAdmin><AdminAnalyticsPage /></RouteGuard> },
   // /admin/reports alias → analytics

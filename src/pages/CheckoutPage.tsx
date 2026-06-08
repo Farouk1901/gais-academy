@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { CreditCard, Upload, CheckCircle, BookOpen, ShieldCheck } from 'lucide-react';
+import { CreditCard, Upload, CheckCircle, BookOpen, ShieldCheck, Tag, X, Loader2 } from 'lucide-react';
 import type { Course } from '@/types/types';
 
 const PAYMENT_METHODS = [
@@ -37,8 +37,10 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [existingSub, setExistingSub] = useState<{ status: string } | null>(null);
   const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: string; value: number } | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   useEffect(() => {
     if (!courseId || !profile) return;
@@ -62,23 +64,49 @@ export default function CheckoutPage() {
   const applyCoupon = async () => {
     if (!couponCode.trim()) return;
     setCouponLoading(true);
-    const { data } = await supabase.from('coupons')
-      .select('*')
-      .eq('code', couponCode.toUpperCase().trim())
-      .eq('is_active', true)
-      .maybeSingle();
-    if (!data) { toast.error('الكوبون غير صالح أو منتهي'); setCouponDiscount(0); }
-    else {
-      const now = new Date();
-      if (data.expires_at && new Date(data.expires_at) < now) { toast.error('انتهت صلاحية هذا الكوبون'); }
-      else if (data.usage_count >= (data.usage_limit || Infinity)) { toast.error('تجاوز هذا الكوبون الحد الأقصى للاستخدام'); }
-      else {
-        const disc = data.coupon_type === 'percentage' ? (basePrice * data.discount_value) / 100 : data.discount_value;
-        setCouponDiscount(disc);
-        toast.success(`تم تطبيق الكوبون! خصم ${data.discount_value}${data.coupon_type === 'percentage' ? '%' : ' ج.م'}`);
+    setCouponError('');
+    try {
+      const { data } = await supabase.from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase().trim())
+        .eq('is_active', true)
+        .maybeSingle();
+      if (!data) {
+        setCouponError('الكوبون غير صالح أو غير موجود');
+        setCouponDiscount(0);
+        setAppliedCoupon(null);
+      } else {
+        const now = new Date();
+        if (data.expires_at && new Date(data.expires_at) < now) {
+          setCouponError('انتهت صلاحية هذا الكوبون');
+          setCouponDiscount(0);
+          setAppliedCoupon(null);
+        } else if (data.usage_count >= (data.usage_limit || Infinity)) {
+          setCouponError('تجاوز هذا الكوبون الحد الأقصى للاستخدام');
+          setCouponDiscount(0);
+          setAppliedCoupon(null);
+        } else {
+          const disc = data.coupon_type === 'percentage'
+            ? Math.min((basePrice * data.discount_value) / 100, basePrice)
+            : Math.min(data.discount_value, basePrice);
+          setCouponDiscount(disc);
+          setAppliedCoupon({ code: data.code, type: data.coupon_type, value: data.discount_value });
+          toast.success(`تم تطبيق الكوبون "${data.code}" بنجاح!`);
+        }
       }
+    } catch (err) {
+      setCouponError('حدث خطأ أثناء التحقق من الكوبون');
+    } finally {
+      setCouponLoading(false);
     }
-    setCouponLoading(false);
+  };
+
+  const removeCoupon = () => {
+    setCouponDiscount(0);
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+    toast.info('تم إلغاء الكوبون');
   };
 
   const submitPayment = async () => {
@@ -122,8 +150,8 @@ export default function CheckoutPage() {
       if (subError) throw subError;
 
       // Update coupon usage
-      if (couponCode.trim() && couponDiscount > 0) {
-        const { data: coupon } = await supabase.from('coupons').select('id, usage_count').eq('code', couponCode.toUpperCase().trim()).maybeSingle();
+      if (appliedCoupon && couponDiscount > 0) {
+        const { data: coupon } = await supabase.from('coupons').select('id, usage_count').eq('code', appliedCoupon.code).maybeSingle();
         if (coupon) await supabase.from('coupons').update({ usage_count: (coupon.usage_count || 0) + 1 }).eq('id', coupon.id);
       }
 
@@ -261,14 +289,58 @@ export default function CheckoutPage() {
         <Card className="stat-card">
           <CardContent className="p-4">
             <Label className="text-sm font-normal text-muted-foreground mb-2 block">كود الخصم (اختياري)</Label>
-            <div className="flex gap-2">
-              <Input value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="COUPON123" className="bg-input border-border flex-1" />
-              <Button variant="ghost" onClick={applyCoupon} disabled={couponLoading} className="border border-border text-foreground hover:bg-accent shrink-0">
-                {couponLoading ? '...' : 'تطبيق'}
-              </Button>
-            </div>
-            {couponDiscount > 0 && (
-              <p className="text-xs text-success mt-2">✓ خصم {couponDiscount.toLocaleString('ar-EG')} ج.م — المبلغ النهائي: {finalPrice.toLocaleString('ar-EG')} ج.م</p>
+
+            {/* Applied coupon badge */}
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between p-3 rounded-lg bg-success/8 border border-success/20">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+                    <Tag className="w-3.5 h-3.5 text-success" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-success font-cairo">{appliedCoupon.code}</p>
+                    <p className="text-xs text-success/80">
+                      خصم {appliedCoupon.value}{appliedCoupon.type === 'percentage' ? '%' : ' ج.م'} — وفّرت {couponDiscount.toLocaleString('ar-EG')} ج.م
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={removeCoupon}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-success/70 hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                  title="إلغاء الكوبون"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    value={couponCode}
+                    onChange={e => { setCouponCode(e.target.value); if (couponError) setCouponError(''); }}
+                    onKeyDown={e => { if (e.key === 'Enter') applyCoupon(); }}
+                    placeholder="أدخل رمز الكوبون..."
+                    className={cn('bg-input border-border flex-1 uppercase placeholder:normal-case', couponError && 'border-destructive')}
+                    disabled={couponLoading}
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={applyCoupon}
+                    disabled={couponLoading || !couponCode.trim()}
+                    className="border border-border text-foreground hover:bg-accent shrink-0 min-w-[72px]"
+                  >
+                    {couponLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : 'تطبيق'}
+                  </Button>
+                </div>
+                {couponError && (
+                  <p className="text-xs text-destructive flex items-center gap-1">
+                    <X className="w-3 h-3 shrink-0" />
+                    {couponError}
+                  </p>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>

@@ -1,0 +1,194 @@
+/* stylelint-disable */
+/* ─── Google Fonts — MUST be first, before @tailwind directives ─────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── GAIS Academy — Premium Dark AI Theme ─────────────────────────────── */
+@layer base {
+  :root {
+    --radius: 0.75rem;
+
+    /* ── Backgrounds ── */
+    --background: 222 47% 4%;            /* #060B18 deep navy black */
+    --foreground: 210 40% 93%;           /* #E8EEF8 soft white */
+    --card: 222 44% 6.5%;               /* #0A1020 card surface */
+    --card-foreground: 210 40% 93%;
+    --popover: 222 44% 6.5%;
+    --popover-foreground: 210 40% 93%;
+
+    /* ── Primary — Electric Blue ── */
+    --primary: 210 100% 56%;             /* #1A90FF vivid blue */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary ── */
+    --secondary: 220 40% 11%;
+    --secondary-foreground: 210 30% 78%;
+
+    /* ── Muted ── */
+    --muted: 222 38% 9%;
+    --muted-foreground: 215 18% 48%;
+
+    /* ── Accent ── */
+    --accent: 222 34% 13%;
+    --accent-foreground: 210 28% 82%;
+
+    /* ── Status ── */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 70% 45%;
+    --warning: 38 90% 52%;
+    --info: 200 88% 50%;
+
+    /* ── Borders & Inputs ── */
+    --border: 222 30% 13%;
+    --input: 222 36% 9%;
+    --ring: 210 100% 56%;
+
+    /* ── Sidebar ── */
+    --sidebar-background: 224 50% 3%;
+    --sidebar-foreground: 210 25% 72%;
+    --sidebar-primary: 210 100% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 36% 9%;
+    --sidebar-accent-foreground: 210 28% 85%;
+    --sidebar-border: 222 30% 10%;
+    --sidebar-ring: 210 100% 56%;
+
+    /* ── Charts ── */
+    --chart-1: 210 100% 56%;
+    --chart-2: 186 100% 48%;
+    --chart-3: 43 90% 54%;
+    --chart-4: 280 65% 62%;
+    --chart-5: 142 70% 45%;
+
+    /* ── Custom tokens ── */
+    --cyan: 186 100% 48%;
+    --gold: 43 90% 54%;
+    --glow-blue: 0 0 24px rgba(26,144,255,0.25);
+    --glow-cyan: 0 0 24px rgba(0,220,235,0.2);
+  }
+
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  *::-webkit-scrollbar { width: 5px; height: 5px; background: transparent; }
+  *::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+
+  html { direction: rtl; }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Noto Kufi Arabic', 'Cairo', 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+    font-feature-settings: 'kern' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Kufi Arabic', 'Cairo', 'Tajawal', sans-serif;
+    @apply text-balance;
+  }
+}
+
+/* ─── Gradient utilities ───────────────────────────────────────────────── */
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(210,100%,65%) 0%, hsl(186,100%,55%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-gold {
+    background: linear-gradient(135deg, hsl(43,90%,60%) 0%, hsl(36,100%,50%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(26,144,255,0.2), 0 0 60px rgba(26,144,255,0.08);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0,210,235,0.18), 0 0 60px rgba(0,210,235,0.06);
+  }
+
+  .glass {
+    background: rgba(10, 16, 32, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .glass-card {
+    background: rgba(10, 16, 32, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(26,144,255,0.1);
+  }
+
+  .circuit-bg {
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(26,144,255,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(0,210,235,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(26,144,255,0.03) 0%, transparent 50%);
+  }
+
+  .hero-gradient {
+    background: linear-gradient(
+      160deg,
+      hsl(222,47%,4%) 0%,
+      hsl(222,55%,7%) 40%,
+      hsl(216,60%,8%) 70%,
+      hsl(222,47%,4%) 100%
+    );
+  }
+
+  .card-hover {
+    transition: all 0.2s ease;
+  }
+  .card-hover:hover {
+    border-color: rgba(26,144,255,0.25);
+    box-shadow: 0 4px 24px rgba(26,144,255,0.08);
+    transform: translateY(-1px);
+  }
+
+  .stat-card {
+    background: linear-gradient(145deg, hsl(222,44%,7%) 0%, hsl(222,40%,9%) 100%);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .status-pending {
+    @apply bg-warning/10 text-warning border border-warning/20;
+  }
+  .status-active {
+    @apply bg-success/10 text-success border border-success/20;
+  }
+  .status-rejected {
+    @apply bg-destructive/10 text-destructive border border-destructive/20;
+  }
+  .status-expired {
+    @apply bg-muted text-muted-foreground border border-border;
+  }
+  .status-info {
+    @apply bg-info/10 text-info border border-info/20;
+  }
+}
+
+/* ─── Admin sidebar animations ─────────────────────────────────────────── */
+@layer components {
+  .nav-item-active {
+    @apply bg-primary/10 text-primary border-r-2 border-primary;
+  }
+  .nav-item {
+    @apply text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-150 rounded-lg;
+  }
+  .admin-stat-icon {
+    @apply rounded-xl p-2.5 flex items-center justify-center;
+  }
+}

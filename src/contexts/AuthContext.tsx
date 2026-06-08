@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { supabase } from '@/db/supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/types/types';
@@ -76,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
 
+  // Tracks whether the getSession initial-load path is currently in progress.
+  // Prevents onAuthStateChange SIGNED_IN from resetting profileLoaded while
+  // getSession is already mid-load — which would orphan the load with no safety timer.
+  const initialSessionInProgress = useRef(false);
+
   const loadPermissions = async (userId: string, role: string) => {
     try {
       const { data: rolePerm } = await supabase
@@ -100,6 +105,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loadUserProfile = async (userId: string) => {
+    // Per-call safety timer: if this load hangs for any reason (network, RLS issue,
+    // etc.) the UI is unblocked within 5 s.  This is essential because the global
+    // safetyTimer in useEffect is cleared by getSession.finally — meaning any
+    // subsequent loadUserProfile call triggered by onAuthStateChange has NO fallback
+    // without this per-call guard.
+    const perCallTimer = setTimeout(() => setProfileLoaded(true), 5000);
     try {
       const profileData = await getProfile(userId);
       setProfile(profileData);
@@ -110,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Only log the error for debugging.
       console.warn('loadUserProfile error (profile preserved):', err);
     } finally {
+      clearTimeout(perCallTimer);
       setProfileLoaded(true);
     }
   };
@@ -127,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfileLoaded(true);
     }, 3000); // 3 s is enough: getSession + getProfile should complete well within that
 
+    initialSessionInProgress.current = true;
     supabase.auth.getSession()
       .then(async ({ data: { session } }) => {
         setUser(session?.user ?? null);
@@ -138,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => { setProfileLoaded(true); })
       .finally(() => {
+        initialSessionInProgress.current = false;
         clearTimeout(safetyTimer);
         setLoading(false);
       });
@@ -145,9 +159,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Only reset profileLoaded for actual sign-in, NOT token refresh.
-        // TOKEN_REFRESHED was causing profileLoaded to reset → isLoading stuck = true.
         if (event === 'SIGNED_IN') {
+          // Skip if getSession is already handling the initial profile load.
+          // Without this guard, onAuthStateChange fires SIGNED_IN for existing sessions
+          // right after getSession resolves, resets profileLoaded=false, and triggers a
+          // second loadUserProfile — but the global safetyTimer was already cleared by
+          // getSession.finally, so if this second load hangs, isLoading stays true forever.
+          if (initialSessionInProgress.current) return;
           setProfileLoaded(false);
         }
         await loadUserProfile(session.user.id);

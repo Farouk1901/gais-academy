@@ -6,23 +6,36 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import { toast } from 'sonner';
+import { supabase } from '@/db/supabase';
 
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) {
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast.error('يرجى تعبئة جميع الحقول المطلوبة');
       return;
     }
     setLoading(true);
-    // Simulate send
-    await new Promise(r => setTimeout(r, 1000));
-    toast.success('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
-    setForm({ name: '', email: '', subject: '', message: '' });
-    setLoading(false);
+    try {
+      const { error } = await supabase.from('contact_messages').insert({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+        subject: form.subject.trim() || null,
+        message: form.message.trim(),
+      });
+      if (error) throw error;
+      toast.success('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (err) {
+      console.error('ContactPage submit error:', err);
+      toast.error('حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,15 +104,29 @@ export default function ContactPage() {
                   />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="subject" className="text-sm font-normal">الموضوع</Label>
-                <Input
-                  id="subject"
-                  placeholder="موضوع رسالتك"
-                  value={form.subject}
-                  onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
-                  className="bg-background border-border"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-sm font-normal">رقم الهاتف</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+20 100 000 0000"
+                    value={form.phone}
+                    onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                    className="bg-background border-border"
+                    dir="ltr"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="subject" className="text-sm font-normal">الموضوع</Label>
+                  <Input
+                    id="subject"
+                    placeholder="موضوع رسالتك"
+                    value={form.subject}
+                    onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
+                    className="bg-background border-border"
+                  />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="message" className="text-sm font-normal">الرسالة *</Label>

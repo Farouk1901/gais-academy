@@ -70,8 +70,8 @@ export default {
                     foreground: 'hsl(var(--card-foreground))'
                 },
                 education: {
-                    blue: 'hsl(var(--education-blue))',
-                    green: 'hsl(var(--education-green))'
+                    blue: 'hsl(221 83% 53%)',
+                    green: 'hsl(142 71% 45%)'
                 },
                 success: 'hsl(var(--success) / <alpha-value>)',
                 warning: 'hsl(var(--warning) / <alpha-value>)',

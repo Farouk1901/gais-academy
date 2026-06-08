@@ -30,15 +30,22 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     if (!profile?.id) return;
-    supabase
-      .from('payments')
-      .select('*, courses(title_ar)')
-      .eq('student_id', profile.id)
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
+    const fetch = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('payments')
+          .select('*, courses(title_ar)')
+          .eq('student_id', profile.id)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
         setPayments(Array.isArray(data) ? (data as Payment[]) : []);
+      } catch (err) {
+        console.error('PaymentsPage fetch error:', err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetch();
   }, [profile?.id]);
 
   return (

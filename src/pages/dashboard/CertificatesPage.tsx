@@ -13,15 +13,22 @@ export default function CertificatesPage() {
 
   useEffect(() => {
     if (!profile?.id) return;
-    supabase
-      .from('certificates')
-      .select('*, courses(title_ar, instructor_name, thumbnail_url)')
-      .eq('student_id', profile.id)
-      .order('issued_at', { ascending: false })
-      .then(({ data }) => {
+    const fetch = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('certificates')
+          .select('*, courses(title_ar, instructor_name, thumbnail_url)')
+          .eq('student_id', profile.id)
+          .order('issued_at', { ascending: false });
+        if (error) throw error;
         setCerts(Array.isArray(data) ? (data as Certificate[]) : []);
+      } catch (err) {
+        console.error('CertificatesPage fetch error:', err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetch();
   }, [profile?.id]);
 
   return (

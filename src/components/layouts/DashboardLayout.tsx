@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 const studentNavItems = [
   { label: 'لوحة التحكم', icon: LayoutDashboard, href: '/dashboard' },
   { label: 'كورساتي', icon: BookOpen, href: '/dashboard/courses' },
+  { label: 'حالة الاشتراك', icon: GraduationCap, href: '/dashboard/subscription' },
   { label: 'الشهادات', icon: Award, href: '/dashboard/certificates' },
   { label: 'المدفوعات', icon: CreditCard, href: '/dashboard/payments' },
   { label: 'الدعم الفني', icon: HeadphonesIcon, href: '/dashboard/support' },

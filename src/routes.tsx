@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 import { RouteGuard } from '@/components/common/RouteGuard';
 
 // Public pages
 import HomePage from './pages/HomePage';
 import CoursesPage from './pages/CoursesPage';
 import CourseDetailPage from './pages/CourseDetailPage';
+import PricingPage from './pages/PricingPage';
 import AboutPage from './pages/AboutPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
@@ -28,6 +30,7 @@ import PaymentsPage from './pages/dashboard/PaymentsPage';
 import SupportPage from './pages/dashboard/SupportPage';
 import NotificationsPage from './pages/dashboard/NotificationsPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
+import SubscriptionStatusPage from './pages/dashboard/SubscriptionStatusPage';
 
 // Learning
 import LearnPage from './pages/LearnPage';
@@ -64,6 +67,7 @@ export const routes: RouteConfig[] = [
   { name: 'Home', path: '/', element: <HomePage />, public: true },
   { name: 'Courses', path: '/courses', element: <CoursesPage />, public: true },
   { name: 'Course Detail', path: '/courses/:id', element: <CourseDetailPage />, public: true },
+  { name: 'Pricing', path: '/pricing', element: <PricingPage />, public: true },
   { name: 'About', path: '/about', element: <AboutPage />, public: true },
   { name: 'FAQ', path: '/faq', element: <FAQPage />, public: true },
   { name: 'Contact',       path: '/contact',       element: <ContactPage />,      public: true },
@@ -75,6 +79,8 @@ export const routes: RouteConfig[] = [
 
   // ── Auth ─────────────────────────────────────────────────────────────
   { name: 'Login', path: '/login', element: <LoginPage />, public: true },
+  // /admin/login redirects to /login (admins use the same login page)
+  { name: 'Admin Login Redirect', path: '/admin/login', element: <Navigate to="/login" replace />, public: true },
   { name: 'Register', path: '/register', element: <RegisterPage />, public: true },
   { name: 'Forgot Password', path: '/forgot-password', element: <ForgotPasswordPage />, public: true },
   { name: 'Reset Password', path: '/reset-password', element: <ResetPasswordPage />, public: true },
@@ -101,6 +107,11 @@ export const routes: RouteConfig[] = [
     element: <RouteGuard requireAuth><PaymentsPage /></RouteGuard>,
   },
   {
+    name: 'Subscription Status',
+    path: '/dashboard/subscription',
+    element: <RouteGuard requireAuth><SubscriptionStatusPage /></RouteGuard>,
+  },
+  {
     name: 'Support',
     path: '/dashboard/support',
     element: <RouteGuard requireAuth><SupportPage /></RouteGuard>,
@@ -114,6 +125,12 @@ export const routes: RouteConfig[] = [
     name: 'Profile',
     path: '/dashboard/profile',
     element: <RouteGuard requireAuth><ProfilePage /></RouteGuard>,
+  },
+  // /dashboard/settings alias → profile
+  {
+    name: 'Settings',
+    path: '/dashboard/settings',
+    element: <Navigate to="/dashboard/profile" replace />,
   },
 
   // ── Protected: Learning & Checkout ───────────────────────────────────
@@ -143,6 +160,8 @@ export const routes: RouteConfig[] = [
   { name: 'Admin Notifications', path: '/admin/notifications', element: <RouteGuard requireAdmin><AdminNotificationsPage /></RouteGuard> },
   { name: 'Admin Support', path: '/admin/support', element: <RouteGuard requireAdmin><AdminSupportPage /></RouteGuard> },
   { name: 'Admin Analytics', path: '/admin/analytics', element: <RouteGuard requireAdmin><AdminAnalyticsPage /></RouteGuard> },
+  // /admin/reports alias → analytics
+  { name: 'Admin Reports', path: '/admin/reports', element: <Navigate to="/admin/analytics" replace /> },
   { name: 'Admin Logs', path: '/admin/logs', element: <RouteGuard requireAdmin><AdminActivityLogsPage /></RouteGuard> },
   { name: 'Admin Settings', path: '/admin/settings', element: <RouteGuard requireAdmin><AdminSettingsPage /></RouteGuard> },
 ];

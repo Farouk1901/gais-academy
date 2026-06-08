@@ -83,19 +83,108 @@ export default function AdminPaymentsPage() {
     if (!selected || !profile) return;
     setActionLoading(true);
     try {
-      const { error } = await supabase.from('payments').update({ status, admin_notes: adminNotes || null, approved_by: profile.id, approved_at: new Date().toISOString(), ...extra }).eq('id', selected.id);
-      if (error) throw error;
-      // If approving payment, also try approving the linked subscription
+      // 1. Update payment status
+      const { error: payErr } = await supabase
+        .from('payments')
+        .update({
+          status,
+          admin_notes: adminNotes || null,
+          approved_by: profile.id,
+          approved_at: new Date().toISOString(),
+          ...extra,
+        })
+        .eq('id', selected.id);
+      if (payErr) throw payErr;
+
+      // 2. When payment is approved → auto-approve subscription + create enrollment
       if (status === 'approved') {
-        const { data: subs } = await supabase.from('subscriptions').select('id, status').eq('payment_id', selected.id);
-        if (subs && subs.length > 0 && subs[0].status === 'pending_approval') {
-          toast.info('الدفع تم قبوله. يمكنك الآن الموافقة على الاشتراك من صفحة الاشتراكات.');
+        const { data: subs, error: subFetchErr } = await supabase
+          .from('subscriptions')
+          .select('id, status, student_id, course_id')
+          .eq('payment_id', selected.id);
+
+        if (subFetchErr) {
+          console.error('subscription fetch error:', subFetchErr);
+        } else if (subs && subs.length > 0) {
+          const sub = subs[0];
+
+          // Approve subscription
+          const { error: subErr } = await supabase
+            .from('subscriptions')
+            .update({
+              status: 'active',
+              approved_by: profile.id,
+              approved_at: new Date().toISOString(),
+            })
+            .eq('id', sub.id);
+          if (subErr) console.error('subscription approve error:', subErr);
+
+          // Create enrollment if not exists
+          const studentId = sub.student_id ?? selected.student_id;
+          const courseId  = sub.course_id  ?? selected.course_id;
+          if (studentId && courseId) {
+            const { data: existing } = await supabase
+              .from('enrollments')
+              .select('id')
+              .eq('student_id', studentId)
+              .eq('course_id', courseId)
+              .maybeSingle();
+
+            if (!existing) {
+              const { error: enrErr } = await supabase
+                .from('enrollments')
+                .insert({ student_id: studentId, course_id: courseId, enrolled_at: new Date().toISOString() });
+              if (enrErr) console.error('enrollment create error:', enrErr);
+            }
+          }
+
+          // Notify student
+          if (studentId) {
+            await supabase.from('notifications').insert({
+              user_id: studentId,
+              title: 'تم قبول اشتراكك',
+              message: `تمت الموافقة على دفعتك وتم تفعيل اشتراكك في الكورس. يمكنك البدء بالتعلم الآن.`,
+              type: 'subscription_approved',
+            });
+          }
         }
       }
+
+      // 3. When payment is rejected → reject linked subscription and notify
+      if (status === 'rejected') {
+        const { data: subs } = await supabase
+          .from('subscriptions')
+          .select('id, student_id')
+          .eq('payment_id', selected.id);
+
+        if (subs && subs.length > 0) {
+          const sub = subs[0];
+          await supabase
+            .from('subscriptions')
+            .update({ status: 'rejected', rejection_reason: adminNotes || 'تم رفض الدفع من قبل الإدارة' })
+            .eq('id', sub.id);
+
+          if (sub.student_id) {
+            await supabase.from('notifications').insert({
+              user_id: sub.student_id,
+              title: 'لم يتم قبول دفعتك',
+              message: adminNotes || 'لم يتم قبول طلب الاشتراك. يرجى التواصل مع الدعم الفني لمزيد من التفاصيل.',
+              type: 'subscription_rejected',
+            });
+          }
+        }
+      }
+
       await logActivity(profile.id, `payment_${status}`, 'payment', selected.id);
       toast.success(`تم تحديث حالة الدفع إلى: ${STATUS_LABELS[status]}`);
+      if (status === 'approved') toast.success('تم تفعيل اشتراك الطالب تلقائياً');
       closeDialog(); fetchPayments();
-    } catch { toast.error('فشل في تحديث الحالة'); } finally { setActionLoading(false); }
+    } catch (err) {
+      console.error('updateStatus error:', err);
+      toast.error('فشل في تحديث الحالة');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const fmt = (d?: string | null) => d ? new Date(d).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';

@@ -13,16 +13,23 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!profile?.id) return;
-    supabase
-      .from('notifications')
-      .select('*')
-      .or(`recipient_id.eq.${profile.id},recipient_id.is.null`)
-      .order('created_at', { ascending: false })
-      .limit(30)
-      .then(({ data }) => {
+    const fetch = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .or(`recipient_id.eq.${profile.id},recipient_id.is.null`)
+          .order('created_at', { ascending: false })
+          .limit(30);
+        if (error) throw error;
         setNotifs(Array.isArray(data) ? (data as Notification[]) : []);
+      } catch (err) {
+        console.error('NotificationsPage fetch error:', err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetch();
   }, [profile?.id]);
 
   const markAllRead = async () => {

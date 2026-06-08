@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Sun, Moon, LogOut, User, BookOpen, LayoutDashboard, Shield } from 'lucide-react';
+import { Menu, X, LogOut, User, BookOpen, LayoutDashboard, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -21,6 +21,7 @@ const navLinks = [
   { label: 'الرئيسية',        href: '/' },
   { label: 'من أنا',          href: '/about' },
   { label: 'الدورات',         href: '/courses' },
+  { label: 'الأسعار',         href: '/pricing' },
   { label: 'الخدمات',         href: '/services' },
   { label: 'المدونة',         href: '/blog' },
   { label: 'آراء المتدربين',  href: '/testimonials' },
@@ -30,7 +31,6 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled,    setScrolled]    = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
-  const [darkMode,    setDarkMode]    = useState(true);
   const [lang,        setLang]        = useState<'AR' | 'EN'>('AR');
   const { user, profile, signOut, isAdmin } = useAuth();
   const location = useLocation();
@@ -43,11 +43,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
-
-  const toggleTheme = () => {
-    setDarkMode(p => !p);
-    document.documentElement.classList.toggle('dark');
-  };
 
   const handleSignOut = async () => {
     try {
@@ -131,16 +126,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="hidden md:flex w-8 h-8 items-center justify-center rounded-full bg-muted/30 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors"
-              aria-label="تبديل الثيم"
-            >
-              {darkMode
-                ? <Sun className="w-4 h-4 text-yellow-400" />
-                : <Moon className="w-4 h-4" />}
-            </button>
+            {/* Theme toggle removed — Minimal Light theme only */}
 
             {user ? (
               <>
@@ -271,7 +257,7 @@ export default function Navbar() {
                       </>
                     )}
 
-                    {/* Mobile lang + theme */}
+                    {/* Mobile lang */}
                     <div className="border-t border-sidebar-border mt-2 pt-3 px-3 flex items-center gap-2">
                       <div className="flex items-center rounded-full border border-sidebar-border bg-sidebar-accent/30 p-0.5 gap-0.5">
                         {(['EN', 'AR'] as const).map(l => (
@@ -281,10 +267,6 @@ export default function Navbar() {
                             }`}>{l}</button>
                         ))}
                       </div>
-                      <button onClick={toggleTheme}
-                        className="w-8 h-8 flex items-center justify-center rounded-full border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent">
-                        {darkMode ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
-                      </button>
                     </div>
                   </nav>
 

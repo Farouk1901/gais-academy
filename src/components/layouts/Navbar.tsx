@@ -73,7 +73,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-4">
 
           {/* ── Logo ── */}
-          <Link to="/" className="flex items-center gap-3 shrink-0 group">
+          <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 shrink-0 group">
             <div className="relative">
               <img
                 src={LOGO_URL}

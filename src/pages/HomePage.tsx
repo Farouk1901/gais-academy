@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
   Brain, Zap, BookOpen, Users, Award, Star, Shield, Clock,
   CheckCircle, GraduationCap, Play, Quote, Sparkles, Target,
-  TrendingUp, CreditCard, Smartphone, Globe, Facebook, MessageCircle
+  TrendingUp, Facebook, MessageCircle
 } from 'lucide-react';
 import type { Course } from '@/types/types';
 import PublicLayout from '@/components/layouts/PublicLayout';
@@ -31,11 +31,7 @@ const FEATURES = [
   { icon: Users, title: 'دعم فني متواصل', desc: 'فريق الأكاديمية متاح لمساعدتك طوال رحلتك' },
 ];
 
-const PAYMENT_METHODS = [
-  { name: 'فودافون كاش', icon: Smartphone, detail: '01069689082', color: 'bg-red-500/10 text-red-500' },
-  { name: 'إنستا باي', icon: CreditCard, detail: 'sofa79@instapay', link: 'https://ipn.eg/S/sofa79/instapay/0HH2Da', color: 'bg-purple-500/10 text-purple-500' },
-  { name: 'باي بال', icon: Globe, detail: 'paypal.me/Farouk1981', link: 'https://paypal.me/Farouk1981', color: 'bg-blue-500/10 text-blue-500' },
-];
+
 
 function TestimonialsCarousel() {
   const [active, setActive] = useState(0);
@@ -126,10 +122,10 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm font-medium">
                 <Sparkles className="w-4 h-4" /> أكاديمية الذكاء الاصطناعي الأولى بالعربية
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-relaxed">
                 <span className="block text-foreground">أكاديمية</span>
                 <span className="block text-primary">الجوهري</span>
-                <span className="block text-3xl md:text-4xl lg:text-5xl mt-2 text-muted-foreground font-semibold">للذكاء الاصطناعي</span>
+                <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 text-muted-foreground font-semibold">للذكاء الاصطناعي</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed">
                 تعلّم الذكاء الاصطناعي بمحتوى عربي احترافي. كورسات متخصصة، شهادات معتمدة، ومجتمع يساعدك على الوصول لأعلى مستويات الاحتراف.
@@ -273,38 +269,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ PAYMENT METHODS ═══ */}
-      <section className="py-24 px-6 bg-card/50 border-y border-border">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm font-medium mb-5">
-              <CreditCard className="w-4 h-4" /> وسائل الدفع المتاحة
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">ادفع بالطريقة الأنسب لك</h2>
-            <p className="text-lg text-muted-foreground">نوفّر لك عدة وسائل دفع آمنة وسريعة</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PAYMENT_METHODS.map(pm => (
-              <Card key={pm.name} className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 hover:border-primary/20">
-                <CardContent className="p-8 text-center space-y-5">
-                  <div className={`w-16 h-16 rounded-2xl ${pm.color} flex items-center justify-center mx-auto`}>
-                    <pm.icon className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground">{pm.name}</h3>
-                  <p className="text-muted-foreground font-mono text-sm ltr-number" dir="ltr">{pm.detail}</p>
-                  {pm.link && (
-                    <a href={pm.link} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" className="gap-2 rounded-xl w-full mt-2 border-2 hover:bg-primary/5 hover:border-primary/30">
-                        ادفع الآن
-                      </Button>
-                    </a>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* ═══ CTA ═══ */}
       <section className="py-24 px-6">

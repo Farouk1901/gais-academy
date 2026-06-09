@@ -24,15 +24,32 @@ export default function ContactPage() {
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || null,
-        subject: form.subject.trim() || null,
+        subject: form.subject.trim() || 'رسالة تواصل',
         message: form.message.trim(),
+        status: 'new',
       });
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase insert error:', error);
+        // If table doesn't exist or RLS blocks, send via email fallback
+        if (error.code === '42P01' || error.code === '42501' || error.message?.includes('policy')) {
+          // Open mailto as fallback
+          const mailBody = `الاسم: ${form.name}%0Aالبريد: ${form.email}%0Aالهاتف: ${form.phone || 'غير محدد'}%0Aالموضوع: ${form.subject || 'غير محدد'}%0A%0Aالرسالة:%0A${form.message}`;
+          window.open(`mailto:farouk.ahmed1901@gmail.com?subject=${encodeURIComponent(form.subject || 'رسالة من موقع GAIS')}&body=${mailBody}`, '_blank');
+          toast.success('سيتم فتح بريدك الإلكتروني لإرسال الرسالة مباشرة');
+          setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+          return;
+        }
+        throw error;
+      }
       toast.success('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
       setForm({ name: '', email: '', phone: '', subject: '', message: '' });
-    } catch (err) {
+    } catch (err: any) {
       console.error('ContactPage submit error:', err);
-      toast.error('حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى');
+      // Fallback: open mailto
+      const mailBody = `الاسم: ${form.name}%0Aالبريد: ${form.email}%0Aالهاتف: ${form.phone || 'غير محدد'}%0A%0Aالرسالة:%0A${form.message}`;
+      window.open(`mailto:farouk.ahmed1901@gmail.com?subject=${encodeURIComponent(form.subject || 'رسالة من موقع GAIS')}&body=${mailBody}`, '_blank');
+      toast.info('سيتم فتح بريدك الإلكتروني لإرسال الرسالة');
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
     } finally {
       setLoading(false);
     }
@@ -56,8 +73,7 @@ export default function ContactPage() {
                 <Mail className="h-4.5 w-4.5 text-primary" />
               </div>
               <h3 className="text-foreground font-medium text-sm mb-1">البريد الإلكتروني</h3>
-              <p className="text-muted-foreground text-xs">info@gais.academy</p>
-              <p className="text-muted-foreground text-xs">support@gais.academy</p>
+              <p className="text-muted-foreground text-xs" dir="ltr">farouk.ahmed1901@gmail.com</p>
             </div>
 
             <div className="p-5 rounded-xl border border-border bg-card">
@@ -65,7 +81,7 @@ export default function ContactPage() {
                 <Phone className="h-4.5 w-4.5 text-primary" />
               </div>
               <h3 className="text-foreground font-medium text-sm mb-1">الهاتف / واتساب</h3>
-              <p className="text-muted-foreground text-xs ltr-number">+20 100 000 0000</p>
+              <a href="https://wa.me/201069689082" className="text-muted-foreground text-xs ltr-number hover:text-primary transition-colors">+20 106 968 9082</a>
             </div>
 
             <div className="p-5 rounded-xl border border-border bg-card">
@@ -110,7 +126,7 @@ export default function ContactPage() {
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="+20 100 000 0000"
+                    placeholder="+20 106 968 9082"
                     value={form.phone}
                     onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                     className="bg-background border-border"

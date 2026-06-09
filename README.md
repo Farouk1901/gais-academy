@@ -39,7 +39,7 @@ Miaoda Application Link URL
 
 ## Tech Stack
 
-Vite, TypeScript, React, Supabase
+Vite, TypeScript, React, Supabase .
 
 ## Development Guidelines
 

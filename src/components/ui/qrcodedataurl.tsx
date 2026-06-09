@@ -95,3 +95,5 @@ const QRCodeDataUrl: React.FC<QRCodeDataUrlProps> = ({
 };
 
 export default QRCodeDataUrl;
+
+

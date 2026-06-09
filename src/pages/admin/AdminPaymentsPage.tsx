@@ -386,3 +386,5 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return <div><p className="text-xs text-muted-foreground">{label}</p><p className="text-sm text-foreground font-medium">{value}</p></div>;
 }
 
+
+

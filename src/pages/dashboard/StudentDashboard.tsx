@@ -125,7 +125,7 @@ export default function StudentDashboard() {
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-14 relative">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary to-red-400 flex items-center justify-center shadow-lg shadow-primary/20">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
                 <User className="w-8 h-8 md:w-10 md:h-10 text-white" />
               </div>
               <div>
@@ -139,7 +139,7 @@ export default function StudentDashboard() {
             </div>
             <div className="flex gap-3">
               <Link to="/courses">
-                <Button className="gap-2 bg-gradient-to-r from-primary to-red-400 text-white border-0 rounded-xl shadow-md shadow-primary/20 hover:shadow-lg px-6">
+                <Button className="gap-2 bg-primary text-white border-0 rounded-xl shadow-md shadow-primary/20 hover:shadow-lg px-6">
                   <Sparkles className="w-4 h-4" />
                   استعرض الكورسات
                 </Button>
@@ -237,7 +237,7 @@ export default function StudentDashboard() {
                   تصفح الكورسات المتاحة وابدأ رحلتك التعليمية في الذكاء الاصطناعي
                 </p>
                 <Link to="/courses">
-                  <Button className="gap-2 bg-gradient-to-r from-primary to-red-400 text-white rounded-xl px-6">
+                  <Button className="gap-2 bg-primary text-white rounded-xl px-6">
                     <Sparkles className="w-4 h-4" />
                     استعرض الكورسات
                   </Button>
@@ -280,7 +280,7 @@ export default function StudentDashboard() {
                       )}
                       {canAccess && course && (
                         <Link to={`/learn/${course.id}`}>
-                          <Button size="sm" className="w-full mt-4 gap-2 h-10 text-sm bg-gradient-to-r from-primary to-red-400 text-white rounded-xl">
+                          <Button size="sm" className="w-full mt-4 gap-2 h-10 text-sm bg-primary text-white rounded-xl">
                             <PlayCircle className="w-4 h-4" /> متابعة التعلم
                           </Button>
                         </Link>
@@ -351,3 +351,5 @@ export default function StudentDashboard() {
     </div>
   );
 }
+
+

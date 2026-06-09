@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { Course } from '@/types/types';
 import ImageSlider from '@/components/common/ImageSlider';
+import PublicLayout from '@/components/layouts/PublicLayout';
 
 // ── Image constants (AI / training themed) ───────────────────────────────
 const IMG_HERO_INSTRUCTOR = 'https://zyytenpbedirhnrwiizg.supabase.co/storage/v1/object/public/assets/instructor/ahmed-aljohary.jpg';
@@ -163,6 +164,7 @@ export default function HomePage() {
   }, []);
 
   return (
+    <PublicLayout>
     <div className="min-h-screen bg-background text-foreground" dir="rtl">
 
       {/* ════════════════════════════════════════════════════
@@ -687,5 +689,6 @@ export default function HomePage() {
 
       {/* Footer is provided by PublicLayout */}
     </div>
+    </PublicLayout>
   );
 }

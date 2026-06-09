@@ -61,8 +61,11 @@ export default function AdminVideosPage() {
 
   const saveVideo = async () => {
     if (!form.lesson_id || !form.title_ar) { toast.error('الدرس والعنوان مطلوبان'); return; }
+    if (dialogType === 'create' && !form.video_url.trim()) { toast.error('رابط الفيديو مطلوب'); return; }
     setActionLoading(true);
-    const payload = { lesson_id: form.lesson_id, title_ar: form.title_ar, video_type: form.video_type, duration_seconds: Number(form.duration_seconds) || null, is_protected: form.is_protected, watermark_enabled: form.watermark_enabled, watermark_text: form.watermark_text || null, disable_download: form.disable_download, is_published: form.is_published };
+    const payload: Record<string, unknown> = { lesson_id: form.lesson_id, title_ar: form.title_ar, title: form.title_ar, video_type: form.video_type, duration_seconds: Number(form.duration_seconds) || null, is_protected: form.is_protected, watermark_enabled: form.watermark_enabled, watermark_text: form.watermark_text || null, disable_download: form.disable_download, is_published: form.is_published };
+    // Include video_url for new videos (required), or for updates when provided
+    if (form.video_url.trim()) payload.video_url = form.video_url.trim();
     try {
       if (dialogType === 'create') {
         const { error } = await supabase.from('videos').insert(payload);
@@ -179,6 +182,7 @@ export default function AdminVideosPage() {
               </div>
               <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">المدة (ثواني)</Label><Input type="number" value={form.duration_seconds} onChange={e => setForm(p => ({ ...p, duration_seconds: Number(e.target.value) }))} className="bg-input border-border" /></div>
             </div>
+            <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">رابط الفيديو {dialogType === 'create' ? '*' : '(اتركه فارغاً للإبقاء على الرابط الحالي)'}</Label><Input value={form.video_url} onChange={e => setForm(p => ({ ...p, video_url: e.target.value }))} placeholder="https://www.youtube.com/watch?v=... أو https://vimeo.com/..." className="bg-input border-border" dir="ltr" /><p className="text-xs text-muted-foreground">يدعم: YouTube, Vimeo, أو رابط فيديو مباشر</p></div>
             <p className="text-xs text-warning bg-warning/5 border border-warning/20 rounded p-2">⚠️ الروابط تُخزن في الخادم فقط ولا تُكشف للمستخدمين مباشرة.</p>
             <div className="space-y-2">
               {[

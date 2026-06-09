@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/db/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import Navbar from '@/components/layouts/Navbar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -123,7 +124,7 @@ export default function LearnPage() {
       const [{ data: c }, { data: ls }, { data: enroll }, { data: sub }] = await Promise.all([
         supabase.from('courses').select('*').eq('id', courseId).maybeSingle(),
         supabase.from('lessons')
-          .select('id, title_ar, title_en, description_ar, duration_minutes, order_index, is_published, is_preview, is_free_preview, course_id')
+          .select('id, title, title_ar, description, description_ar, duration_minutes, order_index, order_number, is_published, is_preview, is_free_preview, course_id')
           .eq('course_id', courseId)
           .eq('is_published', true)
           .order('order_index'),
@@ -160,19 +161,30 @@ export default function LearnPage() {
       }));
       setLessons(enriched);
 
+      // Admin always has access
+      const userIsAdmin = profile.role === 'admin' || profile.role === 'super_admin';
       const isFree = (c as Course & { is_free?: boolean })?.is_free;
-      if (isFree) {
+
+      if (userIsAdmin || isFree) {
         setHasAccess(true);
-        if (enriched.length) setActiveLesson(enriched[0]);
-      } else if (sub?.status === 'active' && enroll?.status === 'active') {
-        setHasAccess(true);
-        setEnrollment(enroll as EnrollmentRow);
-        const lastId = (enroll as EnrollmentRow).last_watched_lesson_id;
+        if (enroll) setEnrollment(enroll as EnrollmentRow);
+        const lastId = (enroll as EnrollmentRow | null)?.last_watched_lesson_id;
         const startLesson = lastId ? enriched.find(l => l.id === lastId) ?? enriched[0] : enriched[0];
         if (startLesson) setActiveLesson(startLesson);
+      } else if (sub?.status === 'active') {
+        setHasAccess(true);
+        if (enroll) {
+          setEnrollment(enroll as EnrollmentRow);
+          const lastId = (enroll as EnrollmentRow).last_watched_lesson_id;
+          const startLesson = lastId ? enriched.find(l => l.id === lastId) ?? enriched[0] : enriched[0];
+          if (startLesson) setActiveLesson(startLesson);
+        } else {
+          // Active subscription but no enrollment — start from first lesson
+          if (enriched.length) setActiveLesson(enriched[0]);
+        }
       } else if (sub) {
         setHasAccess(false);
-        setAccessMessage('الاشتراك نشط ولكن التسجيل لم يُفعَّل بعد. يرجى الانتظار.');
+        setAccessMessage('الاشتراك قيد المراجعة. يرجى الانتظار حتى يتم التفعيل.');
       } else {
         setHasAccess(false);
         setAccessMessage('ليس لديك صلاحية الوصول لهذا الكورس. تأكد من اشتراكك أو تواصل مع الدعم.');
@@ -186,6 +198,17 @@ export default function LearnPage() {
     fetchAll();
   }, [courseId, profile]);
 
+  // ── Helper: convert YouTube/Vimeo watch URLs to embed URLs ─────────────
+  const toEmbedUrl = (url: string): string => {
+    // YouTube: youtube.com/watch?v=xxx or youtu.be/xxx
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+    // Vimeo: vimeo.com/xxx
+    const vmMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vmMatch) return `https://player.vimeo.com/video/${vmMatch[1]}?title=0&byline=0&portrait=0`;
+    return url;
+  };
+
   // ── Fetch signed URL when active lesson changes ───────────────────────
   useEffect(() => {
     if (!activeLesson) { setSignedVideo(null); return; }
@@ -194,6 +217,30 @@ export default function LearnPage() {
       setSignedVideo(null);
       return;
     }
+    // For external videos (YouTube, Vimeo), bypass Edge Function — embed directly
+    if (vm.source_type === 'external') {
+      // Fetch video_url directly from videos table (safe for external links)
+      supabase.from('videos').select('video_url').eq('id', vm.id).maybeSingle().then(({ data }) => {
+        if (data?.video_url) {
+          const embedUrl = toEmbedUrl(data.video_url);
+          setSignedVideo({
+            url: embedUrl,
+            source_type: 'external',
+            expires_at: new Date(Date.now() + 86400000).toISOString(),
+            expires_in_seconds: 86400,
+            watermark_text: vm.watermark_text,
+            disable_download: vm.disable_download,
+            duration_seconds: vm.duration_seconds,
+            thumbnail_url: vm.thumbnail_url,
+            title_ar: vm.title_ar,
+          });
+        } else {
+          setUrlError('لم يتم العثور على رابط الفيديو');
+        }
+      });
+      return;
+    }
+    // For storage/HLS, use Edge Function
     fetchSignedUrl(vm.id, activeLesson.id);
   }, [activeLesson, fetchSignedUrl]);
 
@@ -275,6 +322,7 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      <Navbar />
       {/* Header */}
       <div className="border-b border-border bg-card px-4 py-3 flex items-center gap-3">
         <Link to="/dashboard/courses">

@@ -13,6 +13,8 @@ dist-ssr
 output
 *.local
 package-lock.json
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*
@@ -29,3 +31,10 @@ history/*.json
 .vite_cache
 .skills
 tasks
+
+run_migration.cjs
+supabase/migrations/migration_*.sql
+supabase/migrations/chunk_*.sql
+supabase/migrations/part*.sql
+gais-deploy.zip
+app-*

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, BookOpen, LayoutDashboard, Shield } from 'lucide-react';
+import { Menu, X, LogOut, User, BookOpen, LayoutDashboard, Shield, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -31,7 +32,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled,    setScrolled]    = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
-  const [lang,        setLang]        = useState<'AR' | 'EN'>('AR');
+  const { theme, setTheme } = useTheme();
   const { user, profile, signOut, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,8 +68,8 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
         scrolled
-          ? 'bg-background border-border/60 shadow-sm'
-          : 'bg-background border-border/30'
+          ? 'bg-background/80 backdrop-blur-xl border-border/60 shadow-lg shadow-background/5'
+          : 'bg-background/95 backdrop-blur-sm border-border/30'
       }`}
     >
       <div className="max-w-7xl mx-auto px-3 md:px-6">
@@ -109,24 +110,15 @@ export default function Navbar() {
           {/* ── Right Actions (leftmost in RTL layout) ── */}
           <div className="flex items-center gap-1.5 shrink-0 ms-auto" dir="ltr">
 
-            {/* Language toggle */}
-            <div className="hidden md:flex items-center rounded-full border border-border/50 bg-muted/30 p-0.5 gap-0.5">
-              {(['EN', 'AR'] as const).map(l => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full transition-colors ${
-                    lang === l
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
+            {/* Theme toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg border border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
+              aria-label="تبديل الثيم"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
 
-            {/* Theme toggle removed — Minimal Light theme only */}
 
             {user ? (
               <>
@@ -257,16 +249,15 @@ export default function Navbar() {
                       </>
                     )}
 
-                    {/* Mobile lang */}
+                    {/* Mobile theme toggle */}
                     <div className="border-t border-sidebar-border mt-2 pt-3 px-3 flex items-center gap-2">
-                      <div className="flex items-center rounded-full border border-sidebar-border bg-sidebar-accent/30 p-0.5 gap-0.5">
-                        {(['EN', 'AR'] as const).map(l => (
-                          <button key={l} onClick={() => setLang(l)}
-                            className={`px-2.5 py-0.5 text-xs font-semibold rounded-full transition-colors ${
-                              lang === l ? 'bg-primary text-primary-foreground' : 'text-sidebar-foreground'
-                            }`}>{l}</button>
-                        ))}
-                      </div>
+                      <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors w-full"
+                      >
+                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        {theme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن'}
+                      </button>
                     </div>
                   </nav>
 

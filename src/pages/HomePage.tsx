@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/db/supabase';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,20 +15,20 @@ import ImageSlider from '@/components/common/ImageSlider';
 
 // ── Image constants (AI / training themed) ───────────────────────────────
 const IMG_HERO_INSTRUCTOR = 'https://zyytenpbedirhnrwiizg.supabase.co/storage/v1/object/public/assets/instructor/ahmed-aljohary.jpg';
-const IMG_AI_NEURAL        = 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_565225e9-e587-4e56-bc47-c3384b19ce59.jpg';
-const IMG_STUDENTS         = 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_09668b2c-07e4-4e01-8199-39e15378fd3d.jpg';
-const IMG_AI_ROBOT         = 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_06272bce-72b4-4431-ad4e-34b7e2ec572d.jpg';
-const IMG_CODING           = 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_497739f6-6b6c-42f0-8839-27e842d0aeb3.jpg';
-const IMG_CHATBOT          = 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3becce16-b4b5-4b45-a883-ae7ac88ae3fc.jpg';
+const IMG_AI_NEURAL        = '/images/hero-bg.png';
+const IMG_STUDENTS         = '/images/ai-classroom.png';
+const IMG_AI_ROBOT         = '/images/ai-tech.png';
+const IMG_CODING           = '/images/ai-learning.png';
+const IMG_CHATBOT          = '/images/ai-certificate.png';
 
 // ── Slider images ──────────────────────────────────────────────────────────
 const SLIDER_IMAGES = [
-  { src: 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_565225e9-e587-4e56-bc47-c3384b19ce59.jpg', alt: 'شبكة ذكاء اصطناعي' },
-  { src: 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_09668b2c-07e4-4e01-8199-39e15378fd3d.jpg', alt: 'طلاب يتعلمون' },
-  { src: 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_06272bce-72b4-4431-ad4e-34b7e2ec572d.jpg', alt: 'روبوت AI' },
-  { src: 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_497739f6-6b6c-42f0-8839-27e842d0aeb3.jpg', alt: 'برمجة وكود' },
-  { src: 'https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3becce16-b4b5-4b45-a883-ae7ac88ae3fc.jpg', alt: 'شات بوت ذكاء اصطناعي' },
-  { src: 'https://zyytenpbedirhnrwiizg.supabase.co/storage/v1/object/public/assets/instructor/ahmed-aljohary.jpg', alt: 'أحمد الجوهري' },
+  { src: '/images/hero-bg.png', alt: 'شبكة ذكاء اصطناعي' },
+  { src: '/images/ai-classroom.png', alt: 'بيئة تعلم حديثة' },
+  { src: '/images/ai-tech.png', alt: 'تقنيات الذكاء الاصطناعي' },
+  { src: '/images/ai-learning.png', alt: 'التعلم الذاتي' },
+  { src: '/images/ai-certificate.png', alt: 'شهادات معتمدة' },
+  { src: IMG_HERO_INSTRUCTOR, alt: 'م. أحمد الجوهري' },
 ];
 
 const LEVEL_LABELS: Record<string, string> = {
@@ -37,26 +37,17 @@ const LEVEL_LABELS: Record<string, string> = {
   advanced: 'متقدم',
 };
 
-// ── Testimonials data ────────────────────────────────────────────────────
+// ── Testimonials data (all real trainees) ────────────────────────────────
 const TESTIMONIALS = [
-  {
-    name: 'أحمد محمد السيد',
-    role: 'مطوّر برمجيات',
-    text: 'أكاديمية الجوهري غيّرت مساري المهني بالكامل. تعلّمت الذكاء الاصطناعي من الصفر وأصبحت أعمل في شركة تقنية كبرى.',
-    stars: 5,
-  },
-  {
-    name: 'سارة عبدالله',
-    role: 'محللة بيانات',
-    text: 'المحتوى العربي الاحترافي يميّز الأكاديمية عن كل المنصات الأخرى. شرح واضح وتطبيقات عملية حقيقية.',
-    stars: 5,
-  },
-  {
-    name: 'محمد الحسن',
-    role: 'رائد أعمال',
-    text: 'استثمرت في الكورسات وعادت عليّ بعشرة أضعاف. الآن أقدّم خدمات الذكاء الاصطناعي لشركات كبرى.',
-    stars: 5,
-  },
+  { name: 'أميرة مدحت', role: 'صانعة محتوى رقمي', text: 'الأكاديمية فتحت لي آفاقاً جديدة في إنتاج المحتوى بالذكاء الاصطناعي. أصبحت أُنجز أعمالي بسرعة وجودة لم أكن أتخيلها.', stars: 5 },
+  { name: 'أسماء السبكي', role: 'مهندسة برمجيات', text: 'الشرح العملي والتطبيقات الحقيقية هي ما يميّز هذه الأكاديمية. تعلّمت تقنيات AI بطريقة سلسة واحترافية.', stars: 5 },
+  { name: 'برانديت سامي', role: 'مصممة جرافيك', text: 'كنت أعتقد أن الذكاء الاصطناعي بعيد عن مجالي، لكن الأكاديمية أثبتت لي العكس. الآن أستخدم أدوات AI يومياً في تصميماتي.', stars: 5 },
+  { name: 'ياسر عيسى', role: 'محلل بيانات', text: 'محتوى عربي بجودة عالمية. المنهج متسلسل ومنظّم بشكل ممتاز من الأساسيات حتى التطبيقات المتقدمة.', stars: 5 },
+  { name: 'تامر خليفة', role: 'رائد أعمال', text: 'استثماري في كورسات الأكاديمية كان من أفضل قراراتي المهنية. تعلّمت كيف أوظّف الذكاء الاصطناعي في تطوير أعمالي.', stars: 5 },
+  { name: 'بيشوي مجدي', role: 'مطوّر ويب', text: 'أسلوب الأستاذ أحمد في الشرح يجعل المفاهيم المعقدة بسيطة وواضحة. أنصح أي مبرمج بالانضمام.', stars: 5 },
+  { name: 'أحمد عز الدين', role: 'مهندس ذكاء اصطناعي', text: 'الكورسات ساعدتني على الانتقال من البرمجة التقليدية إلى مجال الذكاء الاصطناعي بثقة كاملة.', stars: 5 },
+  { name: 'هناء سلطان', role: 'أخصائية تسويق رقمي', text: 'تعلّمت استخدام أدوات AI في التسويق الرقمي وتحليل البيانات. الأكاديمية غيّرت طريقة عملي بالكامل.', stars: 5 },
+  { name: 'أماني عيسى', role: 'باحثة أكاديمية', text: 'الدعم المستمر من فريق الأكاديمية والمجتمع التعليمي المتميز جعلا تجربة التعلم ممتعة وفعّالة.', stars: 5 },
 ];
 
 // ── Course categories ────────────────────────────────────────────────────
@@ -66,6 +57,84 @@ const CATEGORIES = [
   { icon: Sparkles,   label: 'نماذج اللغة الكبيرة',       count: 'ChatGPT · Gemini' },
   { icon: Target,     label: 'التطبيقات العملية',          count: 'مشاريع حقيقية' },
 ];
+
+// ── Testimonials Carousel Component ──────────────────────────────────────
+function TestimonialsCarousel() {
+  const [active, setActive] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const total = TESTIMONIALS.length;
+  const visibleCount = typeof window !== 'undefined' && window.innerWidth >= 768 ? 3 : 1;
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setActive(p => (p + 1) % total);
+    }, 4000);
+  }, [total]);
+
+  useEffect(() => { startTimer(); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, [startTimer]);
+
+  const goTo = (i: number) => { setActive(i); startTimer(); };
+
+  // Get visible testimonials (wrapping)
+  const visible: typeof TESTIMONIALS = [];
+  for (let i = 0; i < visibleCount; i++) visible.push(TESTIMONIALS[(active + i) % total]);
+
+  return (
+    <section className="py-20 px-4 bg-card/30 border-y border-border overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium mb-5">
+            <Star className="w-3.5 h-3.5 fill-primary" />
+            آراء حقيقية من متدربينا
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-balance">ماذا يقول طلابنا؟</h2>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">تجارب حقيقية من متدربين غيّرت الأكاديمية مساراتهم المهنية</p>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          {visible.map((t, i) => (
+            <Card key={`${t.name}-${active}-${i}`} className="h-full flex flex-col group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-3">
+              <CardContent className="p-6 flex flex-col gap-4 h-full">
+                <div className="flex items-center justify-between">
+                  <Quote className="w-8 h-8 text-primary/25 group-hover:text-primary/40 transition-colors" />
+                  <div className="flex gap-0.5">
+                    {[...Array(t.stars)].map((_, j) => (
+                      <Star key={j} className="w-3 h-3 fill-warning text-warning" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground text-pretty leading-relaxed flex-1">"{t.text}"</p>
+                <div className="pt-4 border-t border-border/50 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-cyan-500/20 flex items-center justify-center shrink-0">
+                    <span className="text-primary font-bold text-sm">{t.name.charAt(0)}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Navigation dots */}
+        <div className="flex items-center justify-center gap-2">
+          {TESTIMONIALS.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)}
+              className={`transition-all duration-300 rounded-full ${
+                i === active ? 'w-8 h-2 bg-primary' : 'w-2 h-2 bg-border hover:bg-primary/40'
+              }`}
+              aria-label={`شهادة ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -514,37 +583,9 @@ export default function HomePage() {
       </section>
 
       {/* ════════════════════════════════════════════════════
-          TESTIMONIALS
+          TESTIMONIALS — Auto-scrolling carousel (all 9 trainees)
       ════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4 bg-card/30 border-y border-border">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2 text-balance">ماذا يقول طلابنا؟</h2>
-            <p className="text-sm text-muted-foreground">آراء حقيقية من طلاب غيّرت الأكاديمية مساراتهم</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {TESTIMONIALS.map(t => (
-              <Card key={t.name} className="stat-card h-full flex flex-col">
-                <CardContent className="p-5 flex flex-col gap-4 h-full">
-                  <Quote className="w-6 h-6 text-primary/40 shrink-0" />
-                  <p className="text-sm text-muted-foreground text-pretty leading-relaxed flex-1">
-                    "{t.text}"
-                  </p>
-                  <div>
-                    <div className="flex gap-0.5 mb-2">
-                      {[...Array(t.stars)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
-                      ))}
-                    </div>
-                    <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsCarousel />
 
       {/* ════════════════════════════════════════════════════
           AUTO-SCROLLING IMAGE SLIDER
@@ -556,7 +597,6 @@ export default function HomePage() {
           </h2>
           <p className="text-sm text-muted-foreground">صور من داخل الأكاديمية والكورسات</p>
         </div>
-        {/* Fade masks on sides */}
         <div className="relative">
           <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />

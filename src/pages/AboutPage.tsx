@@ -1,5 +1,7 @@
-import { Brain, Target, Users, Award, Cpu, Shield } from 'lucide-react';
+import { Brain, Target, Users, Award, Cpu, Shield, GraduationCap, Sparkles } from 'lucide-react';
 import PublicLayout from '@/components/layouts/PublicLayout';
+
+const IMG_INSTRUCTOR = 'https://zyytenpbedirhnrwiizg.supabase.co/storage/v1/object/public/assets/instructor/ahmed-aljohary.jpg';
 
 const values = [
   { icon: Brain, title: 'الجودة أولاً', desc: 'محتوى تعليمي عالي الجودة يُعدّ بعناية من قبل خبراء في المجال.' },
@@ -10,53 +12,63 @@ const values = [
   { icon: Shield, title: 'الأمان والخصوصية', desc: 'حماية بيانات الطلاب والمحتوى التعليمي بأعلى معايير الأمان.' },
 ];
 
-const team = [
-  { name: 'أ. محمد الجوهري', role: 'المؤسس والمدير التنفيذي', bio: 'خبير في الذكاء الاصطناعي وتعلم الآلة مع أكثر من 10 سنوات خبرة.' },
-  { name: 'أ. سارة أحمد', role: 'مدير المحتوى التعليمي', bio: 'متخصصة في التعلم العميق وبناء المناهج التعليمية التقنية.' },
-  { name: 'أ. خالد محمود', role: 'مدير التقنية', bio: 'مهندس برمجيات متخصص في بناء المنصات التعليمية الرقمية.' },
-];
-
 export default function AboutPage() {
   return (
     <PublicLayout>
       {/* Hero */}
-      <div className="bg-card border-b border-border py-16">
-        <div className="container mx-auto px-4 md:px-6 text-center max-w-3xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-            من نحن
-          </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+      <div className="relative bg-card border-b border-border py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-bl from-primary/5 via-transparent to-cyan-500/5" />
+        <div className="container mx-auto px-4 md:px-6 text-center max-w-3xl relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium mb-6">
+            <Sparkles className="w-3.5 h-3.5" />
+            تعرّف على أكاديمية GAIS
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-5">من نحن</h1>
+          <p className="text-muted-foreground text-sm leading-relaxed text-pretty max-w-2xl mx-auto">
             أكاديمية الجوهري للذكاء الاصطناعي (GAIS) هي منصة تعليمية عربية متخصصة في الذكاء الاصطناعي،
             تأسست بهدف توفير محتوى تعليمي عالي الجودة باللغة العربية لكل من يريد دخول عالم الذكاء الاصطناعي.
           </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-12 space-y-16">
-        {/* Mission */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 md:px-6 py-16 space-y-20">
+
+        {/* Founder Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+          <div className="flex flex-col items-center">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 rounded-full bg-primary/15 blur-2xl scale-110" />
+              <div className="relative w-56 h-56 rounded-full overflow-hidden border-4 border-primary/25 shadow-2xl">
+                <img src={IMG_INSTRUCTOR} alt="م. أحمد الجوهري - مؤسس الأكاديمية"
+                  className="w-full h-full object-cover object-top" />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-1">م. أحمد الجوهري</h3>
+            <p className="text-primary text-sm font-medium mb-2">المؤسس والمدرب الرئيسي</p>
+            <p className="text-muted-foreground text-xs text-center max-w-xs">
+              خبير في الذكاء الاصطناعي وتعلم الآلة وإنتاج المحتوى الرقمي بتقنيات AI
+            </p>
+          </div>
           <div>
-            <h2 className="text-xl font-bold text-foreground mb-3">رسالتنا</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">رسالتنا</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-5">
               نسعى إلى جعل تعلم الذكاء الاصطناعي متاحاً وميسراً لكل ناطق بالعربية،
               من خلال تقديم محتوى تعليمي منظم ومتدرج يأخذ المتعلم من الصفر حتى الاحتراف.
             </p>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               نؤمن بأن اللغة العربية لا يجب أن تكون عائقاً أمام تعلم التقنيات الحديثة،
               لذلك نقدم كل محتوانا بجودة عالمية باللغة العربية.
             </p>
-          </div>
-          <div className="p-6 rounded-xl border border-border bg-card">
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'طلاب مسجلون', value: '12,000+' },
-                { label: 'كورس متاح', value: '48+' },
-                { label: 'ساعة محتوى', value: '800+' },
-                { label: 'شهادة مُصدرة', value: '5,200+' },
-              ].map(stat => (
-                <div key={stat.label} className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">{stat.label}</span>
-                  <span className="text-foreground font-semibold ltr-number">{stat.value}</span>
+                { icon: GraduationCap, label: 'محتوى عربي أصيل', color: 'text-primary' },
+                { icon: Target, label: 'تطبيقات عملية', color: 'text-cyan-400' },
+                { icon: Award, label: 'شهادات معتمدة', color: 'text-warning' },
+                { icon: Users, label: 'دعم متواصل', color: 'text-success' },
+              ].map(f => (
+                <div key={f.label} className="flex items-center gap-2 p-3 rounded-lg border border-border/50 bg-card/50">
+                  <f.icon className={`w-4 h-4 ${f.color} shrink-0`} />
+                  <span className="text-xs text-foreground font-medium">{f.label}</span>
                 </div>
               ))}
             </div>
@@ -65,37 +77,23 @@ export default function AboutPage() {
 
         {/* Values */}
         <div>
-          <h2 className="text-xl font-bold text-foreground mb-8 text-center">قيمنا</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-foreground mb-3">قيمنا</h2>
+            <p className="text-muted-foreground text-sm">المبادئ التي نلتزم بها في كل ما نقدمه</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {values.map(v => {
               const Icon = v.icon;
               return (
-                <div key={v.title} className="p-5 rounded-xl border border-border bg-card">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                    <Icon className="h-4.5 w-4.5 text-primary" />
+                <div key={v.title} className="p-6 rounded-xl border border-border bg-card hover:shadow-md hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="text-foreground font-semibold text-sm mb-2">{v.title}</h3>
                   <p className="text-muted-foreground text-xs leading-relaxed">{v.desc}</p>
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Team */}
-        <div>
-          <h2 className="text-xl font-bold text-foreground mb-8 text-center">فريقنا</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {team.map(m => (
-              <div key={m.name} className="p-5 rounded-xl border border-border bg-card text-center">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-primary font-semibold text-lg">{m.name.charAt(3)}</span>
-                </div>
-                <h3 className="text-foreground font-semibold text-sm">{m.name}</h3>
-                <p className="text-primary text-xs mb-2">{m.role}</p>
-                <p className="text-muted-foreground text-xs leading-relaxed">{m.bio}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>

@@ -65,6 +65,61 @@
     --chart-5: 142 71% 45%;
   }
 
+  .dark {
+    /* ── Backgrounds ── */
+    --background: 222 47% 6%;              /* #0B1120 deep navy */
+    --foreground: 210 20% 96%;             /* #F3F4F6 off-white */
+    --card: 222 40% 9%;                    /* #111827 dark card */
+    --card-foreground: 210 20% 96%;
+    --popover: 222 40% 9%;
+    --popover-foreground: 210 20% 96%;
+
+    /* ── Primary — Signal Blue ── */
+    --primary: 217 91% 60%;               /* #3B82F6 brighter blue for dark */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary ── */
+    --secondary: 217 33% 14%;             /* #1E293B slate */
+    --secondary-foreground: 210 20% 96%;
+
+    /* ── Muted ── */
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 16% 56%;      /* #8B95A5 */
+
+    /* ── Accent ── */
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 20% 96%;
+
+    /* ── Status ── */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 199 89% 48%;
+
+    /* ── Borders & Inputs ── */
+    --border: 217 33% 18%;                /* dark border */
+    --input: 217 33% 14%;
+    --ring: 217 91% 60%;
+
+    /* ── Sidebar ── */
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 215 16% 70%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 14%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 217 91% 60%;
+
+    /* ── Charts ── */
+    --chart-1: 217 91% 60%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 271 81% 56%;
+    --chart-5: 142 71% 45%;
+  }
+
   * {
     @apply border-border;
     scrollbar-width: thin;

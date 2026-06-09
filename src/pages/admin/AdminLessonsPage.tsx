@@ -65,17 +65,43 @@ export default function AdminLessonsPage() {
   const saveLesson = async () => {
     if (!form.title_ar.trim() || !form.course_id) { toast.error('العنوان والكورس مطلوبان'); return; }
     setActionLoading(true);
-    const payload = { title_ar: form.title_ar, title_en: form.title_en || null, description_ar: form.description_ar || null, course_id: form.course_id, order_number: Number(form.order_number), is_free_preview: form.is_free_preview, is_published: form.is_published, duration_minutes: Number(form.duration_minutes) || null };
+    const payload = { title: form.title_ar, title_ar: form.title_ar, description: form.description_ar || null, description_ar: form.description_ar || null, course_id: form.course_id, order_number: Number(form.order_number), order_index: Number(form.order_number), is_free_preview: form.is_free_preview, is_preview: form.is_free_preview, is_published: form.is_published, duration_minutes: Number(form.duration_minutes) || null };
     try {
       if (dialogType === 'create') {
-        const { error } = await supabase.from('lessons').insert(payload);
+        const { data: inserted, error } = await supabase.from('lessons').insert(payload).select('id').single();
         if (error) throw error;
+        // Auto-create video record if URL was provided
+        if (form.video_url.trim() && inserted?.id) {
+          await supabase.from('videos').insert({
+            lesson_id: inserted.id,
+            title: form.title_ar,
+            title_ar: form.title_ar,
+            video_type: 'external',
+            video_url: form.video_url.trim(),
+            is_published: true,
+            is_protected: false,
+            disable_download: true,
+          });
+        }
         toast.success('تم إنشاء الدرس');
         setDialogType(null);
         fetchData();
       } else if (selected) {
         const { error } = await supabase.from('lessons').update(payload).eq('id', selected.id);
         if (error) throw error;
+        // Update or create video record if URL was provided
+        if (form.video_url.trim()) {
+          const { data: existingVideo } = await supabase.from('videos').select('id').eq('lesson_id', selected.id).maybeSingle();
+          if (existingVideo) {
+            await supabase.from('videos').update({ video_url: form.video_url.trim() }).eq('id', existingVideo.id);
+          } else {
+            await supabase.from('videos').insert({
+              lesson_id: selected.id, title: form.title_ar, title_ar: form.title_ar,
+              video_type: 'external', video_url: form.video_url.trim(),
+              is_published: true, is_protected: false, disable_download: true,
+            });
+          }
+        }
         toast.success('تم تحديث الدرس');
         setDialogType(null);
         fetchData();

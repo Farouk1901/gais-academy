@@ -135,3 +135,4 @@ interface CourseCardProps {
   course: Course;
 }
 
+

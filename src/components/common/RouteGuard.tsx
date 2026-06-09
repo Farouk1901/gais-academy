@@ -51,3 +51,4 @@ export function RouteGuard({ children, requireAuth = false, requireAdmin = false
 
   return <>{children}</>;
 }
+

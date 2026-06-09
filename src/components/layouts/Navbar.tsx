@@ -128,7 +128,7 @@ export default function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 rounded-xl border border-border/60 bg-card/50 hover:border-primary/30 px-2 py-1.5 transition-all duration-200 group">
                       <Avatar className="h-7 w-7">
-                        <AvatarFallback className="bg-gradient-to-br from-primary to-blue-400 text-white text-xs font-bold">
+                        <AvatarFallback className="bg-gradient-to-br from-primary to-red-400 text-white text-xs font-bold">
                           {getInitials()}
                         </AvatarFallback>
                       </Avatar>
@@ -143,7 +143,7 @@ export default function Navbar() {
                     <div className="px-4 py-4 bg-gradient-to-br from-primary/5 to-transparent border-b border-border">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-11 w-11">
-                          <AvatarFallback className="bg-gradient-to-br from-primary to-blue-400 text-white text-base font-bold">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-red-400 text-white text-base font-bold">
                             {getInitials()}
                           </AvatarFallback>
                         </Avatar>
@@ -176,8 +176,8 @@ export default function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/dashboard/courses" className="flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer">
-                          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                            <BookOpen className="h-4 w-4 text-blue-500" />
+                          <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                            <BookOpen className="h-4 w-4 text-red-500" />
                           </div>
                           <div>
                             <p className="font-medium">الدورات المحفوظة</p>
@@ -255,7 +255,7 @@ export default function Navbar() {
 
                 {/* Dashboard button */}
                 <Button size="sm" asChild
-                  className="hidden md:flex h-9 text-xs px-5 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white border-0 rounded-xl shadow-md shadow-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30">
+                  className="hidden md:flex h-9 text-xs px-5 bg-gradient-to-r from-primary to-red-400 hover:from-primary/90 hover:to-red-400/90 text-white border-0 rounded-xl shadow-md shadow-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30">
                   <Link to="/dashboard">
                     <Sparkles className="w-3.5 h-3.5 ml-1.5" />
                     منصة التعلم
@@ -270,7 +270,7 @@ export default function Navbar() {
                   <Link to="/login">تسجيل الدخول</Link>
                 </Button>
                 <Button size="sm" asChild
-                  className="hidden md:flex h-9 text-xs px-5 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white border-0 rounded-xl shadow-md shadow-primary/20">
+                  className="hidden md:flex h-9 text-xs px-5 bg-gradient-to-r from-primary to-red-400 hover:from-primary/90 hover:to-red-400/90 text-white border-0 rounded-xl shadow-md shadow-primary/20">
                   <Link to="/register">
                     <Sparkles className="w-3.5 h-3.5 ml-1.5" />
                     ابدأ مجاناً
@@ -353,7 +353,7 @@ export default function Navbar() {
                       <>
                         <div className="flex items-center gap-3 mb-3 px-2">
                           <Avatar className="h-9 w-9">
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-blue-400 text-white text-xs font-bold">
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-red-400 text-white text-xs font-bold">
                               {getInitials()}
                             </AvatarFallback>
                           </Avatar>
@@ -370,7 +370,7 @@ export default function Navbar() {
                       </>
                     ) : (
                       <div className="space-y-2">
-                        <Button size="sm" asChild className="w-full bg-gradient-to-r from-primary to-blue-500 text-white rounded-xl h-10">
+                        <Button size="sm" asChild className="w-full bg-gradient-to-r from-primary to-red-400 text-white rounded-xl h-10">
                           <Link to="/register" onClick={() => setMobileOpen(false)}>ابدأ مجاناً</Link>
                         </Button>
                         <Button variant="outline" size="sm" asChild className="w-full rounded-xl h-10">
@@ -388,3 +388,4 @@ export default function Navbar() {
     </header>
   );
 }
+

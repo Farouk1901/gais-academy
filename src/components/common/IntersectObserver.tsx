@@ -20,3 +20,4 @@ const IntersectObserver = () => {
 };
 
 export default IntersectObserver;
+

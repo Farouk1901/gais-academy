@@ -195,3 +195,4 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
 }
 
 export { useSupabaseUpload, type UseSupabaseUploadOptions, type UseSupabaseUploadReturn }
+

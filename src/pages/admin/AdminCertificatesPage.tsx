@@ -138,3 +138,4 @@ export default function AdminCertificatesPage() {
     </AdminLayout>
   );
 }
+

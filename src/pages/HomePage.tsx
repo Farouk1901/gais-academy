@@ -108,7 +108,7 @@ function TestimonialsCarousel() {
                 </div>
                 <p className="text-sm text-muted-foreground text-pretty leading-relaxed flex-1">"{t.text}"</p>
                 <div className="pt-4 border-t border-border/50 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-cyan-500/20 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-red-400/20 flex items-center justify-center shrink-0">
                     <span className="text-primary font-bold text-sm">{t.name.charAt(0)}</span>
                   </div>
                   <div>
@@ -182,7 +182,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
           {/* Glow accents */}
           <div className="absolute top-1/3 right-0 w-[40vw] h-[40vw] bg-primary/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-cyan-500/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-red-500/6 rounded-full blur-3xl" />
         </div>
 
         <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-24">
@@ -209,7 +209,7 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
                 <Link to="/courses">
-                  <Button size="lg" className="gap-2 w-full sm:w-auto px-8 text-base bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white border-0 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
+                  <Button size="lg" className="gap-2 w-full sm:w-auto px-8 text-base bg-gradient-to-r from-primary to-red-400 hover:from-primary/90 hover:to-red-400/90 text-white border-0 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
                     <BookOpen className="w-5 h-5" />
                     استعرض الكورسات
                   </Button>
@@ -298,7 +298,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               { label: 'طالب مسجّل', value: loading ? null : `${(stats.students || 0).toLocaleString('ar-EG')}+`, icon: GraduationCap, color: 'text-primary' },
-              { label: 'كورس متاح', value: loading ? null : String(stats.courses), icon: BookOpen, color: 'text-cyan-400' },
+              { label: 'كورس متاح', value: loading ? null : String(stats.courses), icon: BookOpen, color: 'text-red-300' },
               { label: 'ساعة تدريبية', value: '٢٠٠+', icon: Clock, color: 'text-warning' },
               { label: 'نسبة رضا الطلاب', value: '٩٨٪', icon: Star, color: 'text-success' },
             ].map(s => (
@@ -565,7 +565,7 @@ export default function HomePage() {
             <div className="hidden md:block absolute top-8 right-[12.5%] left-[12.5%] h-px bg-border z-0" />
             {[
               { num: '١', title: 'سجّل حسابك',    desc: 'أنشئ حساباً مجانياً في دقيقة', icon: Users,        color: 'bg-primary/10 border-primary/20 text-primary' },
-              { num: '٢', title: 'اختر الكورس',   desc: 'تصفّح وابحث عن ما يناسبك',    icon: BookOpen,     color: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
+              { num: '٢', title: 'اختر الكورس',   desc: 'تصفّح وابحث عن ما يناسبك',    icon: BookOpen,     color: 'bg-red-500/10 border-red-500/20 text-red-300' },
               { num: '٣', title: 'أتمّ الدفع',    desc: 'ادفع بطريقتك المفضّلة',       icon: CheckCircle,  color: 'bg-warning/10 border-warning/20 text-warning' },
               { num: '٤', title: 'ابدأ التعلّم',  desc: 'محتوى فوري بعد الموافقة',     icon: Play,         color: 'bg-success/10 border-success/20 text-success' },
             ].map((step) => (
@@ -635,7 +635,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                   <a href="https://www.facebook.com/Farouk1881" target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-md shadow-blue-600/20 hover:shadow-lg transition-all duration-300">
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-blue-700 text-white text-sm font-medium shadow-md shadow-red-600/20 hover:shadow-lg transition-all duration-300">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     فيسبوك
                   </a>
@@ -656,11 +656,11 @@ export default function HomePage() {
       ════════════════════════════════════════════════════ */}
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/8 via-primary/3 to-blue-500/8" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/8 via-primary/3 to-red-400/8" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-primary/5 rounded-full blur-3xl" />
         </div>
         <div className="max-w-2xl mx-auto text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-blue-500/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-red-400/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
             <Brain className="w-8 h-8 text-primary" />
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-balance">
@@ -671,7 +671,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/register">
-              <Button size="lg" className="gap-2 px-8 bg-gradient-to-r from-primary to-blue-500 text-white border-0 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
+              <Button size="lg" className="gap-2 px-8 bg-gradient-to-r from-primary to-red-400 text-white border-0 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
                 <Zap className="w-5 h-5" />
                 سجّل مجاناً الآن
               </Button>
@@ -692,3 +692,4 @@ export default function HomePage() {
     </PublicLayout>
   );
 }
+

@@ -165,3 +165,4 @@ export default function MyCoursesPage() {
     </div>
   );
 }
+

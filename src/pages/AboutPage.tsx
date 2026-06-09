@@ -17,7 +17,7 @@ export default function AboutPage() {
     <PublicLayout>
       {/* Hero */}
       <div className="relative bg-card border-b border-border py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-bl from-primary/5 via-transparent to-cyan-500/5" />
+        <div className="absolute inset-0 bg-gradient-to-bl from-primary/5 via-transparent to-red-400/5" />
         <div className="container mx-auto px-4 md:px-6 text-center max-w-3xl relative">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
@@ -62,7 +62,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { icon: GraduationCap, label: 'محتوى عربي أصيل', color: 'text-primary' },
-                { icon: Target, label: 'تطبيقات عملية', color: 'text-cyan-400' },
+                { icon: Target, label: 'تطبيقات عملية', color: 'text-red-300' },
                 { icon: Award, label: 'شهادات معتمدة', color: 'text-warning' },
                 { icon: Users, label: 'دعم متواصل', color: 'text-success' },
               ].map(f => (
@@ -100,3 +100,4 @@ export default function AboutPage() {
     </PublicLayout>
   );
 }
+

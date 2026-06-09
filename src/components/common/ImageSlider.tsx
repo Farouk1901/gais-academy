@@ -64,3 +64,4 @@ export default function ImageSlider({ images, speed = 40 }: ImageSliderProps) {
     </div>
   );
 }
+

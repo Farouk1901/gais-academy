@@ -279,7 +279,7 @@ export default function AdminDashboard() {
       {/* Stat Cards Row 1 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard title="إجمالي الطلاب" value={stats?.totalStudents ?? 0} icon={GraduationCap} color="bg-primary/10 text-primary" sub={`+${stats?.newStudentsMonth ?? 0} هذا الشهر`} loading={loading} />
-        <StatCard title="الكورسات" value={stats?.totalCourses ?? 0} icon={BookOpen} color="bg-cyan/10 text-cyan-400" sub={`${stats?.publishedCourses ?? 0} منشور`} loading={loading} />
+        <StatCard title="الكورسات" value={stats?.totalCourses ?? 0} icon={BookOpen} color="bg-cyan/10 text-red-300" sub={`${stats?.publishedCourses ?? 0} منشور`} loading={loading} />
         <StatCard title="الاشتراكات النشطة" value={stats?.activeSubscriptions ?? 0} icon={Layers} color="bg-success/10 text-success" sub={`${stats?.pendingSubscriptions ?? 0} انتظار موافقة`} loading={loading} />
         <StatCard title="إجمالي الإيرادات" value={`${(stats?.totalRevenue ?? 0).toLocaleString('ar-EG')} ج.م`} icon={TrendingUp} color="bg-warning/10 text-warning" sub={`${(stats?.monthRevenue ?? 0).toLocaleString('ar-EG')} ج.م هذا الشهر`} loading={loading} />
       </div>
@@ -479,3 +479,4 @@ export default function AdminDashboard() {
     </AdminLayout>
   );
 }
+

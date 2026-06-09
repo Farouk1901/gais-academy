@@ -167,3 +167,4 @@ export const routes: RouteConfig[] = [
   { name: 'Admin Logs', path: '/admin/logs', element: <RouteGuard requireAdmin><AdminActivityLogsPage /></RouteGuard> },
   { name: 'Admin Settings', path: '/admin/settings', element: <RouteGuard requireAdmin><AdminSettingsPage /></RouteGuard> },
 ];
+

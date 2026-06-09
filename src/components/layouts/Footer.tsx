@@ -52,7 +52,7 @@ export default function Footer() {
                 href="https://www.facebook.com/Farouk1881"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/10 to-blue-500/5 border border-blue-500/20 flex items-center justify-center text-blue-500 hover:bg-blue-600 hover:text-white hover:border-blue-600 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
+                className="group w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/10 to-red-400/5 border border-red-500/20 flex items-center justify-center text-red-500 hover:bg-red-600 hover:text-white hover:border-blue-600 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300"
                 aria-label="Facebook"
               >
                 <Facebook className="h-4.5 w-4.5" />
@@ -115,7 +115,7 @@ export default function Footer() {
             {/* Instructor Card */}
             <div className="rounded-2xl border border-border bg-card/50 p-4 mb-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-blue-500/10 border border-primary/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-red-400/10 border border-primary/20 flex items-center justify-center">
                   <span className="text-primary font-bold text-lg">أ</span>
                 </div>
                 <div>
@@ -125,7 +125,7 @@ export default function Footer() {
               </div>
               <div className="flex gap-2">
                 <a href="https://www.facebook.com/Farouk1881" target="_blank" rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-blue-600/10 text-blue-500 text-xs font-medium border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all duration-300">
+                  className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-red-600/10 text-red-500 text-xs font-medium border border-red-500/20 hover:bg-red-600 hover:text-white transition-all duration-300">
                   <Facebook className="h-3.5 w-3.5" />
                   فيسبوك
                   <ExternalLink className="h-3 w-3" />

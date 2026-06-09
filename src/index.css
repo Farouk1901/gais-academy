@@ -1,60 +1,60 @@
 /* stylelint-disable */
-/* ─── Google Fonts — Arabic + Minimal ───────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+/* ─── Google Fonts — Arabic + Modern ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── GAIS Academy — Minimal Light Theme ───────────────────────────────── */
+/* ─── GAIS Academy — Premium Light Theme ─────────────────────────────────── */
 @layer base {
   :root {
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
     /* ── Backgrounds ── */
-    --background: 0 0% 100%;              /* #FFFFFF pure white */
-    --foreground: 220 13% 9%;             /* #111827 dark gray */
-    --card: 0 0% 100%;                    /* white card */
-    --card-foreground: 220 13% 9%;
+    --background: 220 20% 97%;            /* #F5F6FA soft cool white */
+    --foreground: 222 47% 11%;            /* #0F172A deep slate */
+    --card: 0 0% 100%;                    /* pure white */
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 9%;
+    --popover-foreground: 222 47% 11%;
 
-    /* ── Primary — Signal Blue ── */
-    --primary: 221 83% 53%;               /* #2563EB professional blue */
+    /* ── Primary — Royal Blue ── */
+    --primary: 221 83% 53%;               /* #2563EB */
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 210 20% 96%;             /* #F3F4F6 very light gray */
-    --secondary-foreground: 220 13% 9%;
+    --secondary: 214 32% 91%;             /* #DDE4EE soft blue-gray */
+    --secondary-foreground: 222 47% 11%;
 
     /* ── Muted ── */
-    --muted: 210 20% 98%;                 /* #F8F9FB nearly white */
-    --muted-foreground: 220 9% 46%;       /* #6B7280 medium gray */
+    --muted: 220 14% 96%;                 /* #F1F5F9 */
+    --muted-foreground: 215 16% 47%;      /* #64748B */
 
     /* ── Accent ── */
-    --accent: 210 20% 96%;
-    --accent-foreground: 220 13% 9%;
+    --accent: 214 32% 91%;
+    --accent-foreground: 222 47% 11%;
 
     /* ── Status ── */
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --success: 142 71% 45%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
 
     /* ── Borders & Inputs ── */
-    --border: 220 13% 91%;                /* #E5E7EB fine light border */
-    --input: 220 13% 96%;                 /* #F1F2F4 */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 221 83% 53%;
 
     /* ── Sidebar ── */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 9% 46%;
+    --sidebar-foreground: 215 16% 47%;
     --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 20% 98%;
-    --sidebar-accent-foreground: 220 13% 9%;
-    --sidebar-border: 220 13% 91%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
     --sidebar-ring: 221 83% 53%;
 
     /* ── Charts ── */
@@ -63,53 +63,58 @@
     --chart-3: 38 92% 50%;
     --chart-4: 271 81% 56%;
     --chart-5: 142 71% 45%;
+
+    /* ── GAIS Custom ── */
+    --gais-gradient-start: 221 83% 53%;   /* blue */
+    --gais-gradient-end: 192 91% 36%;     /* teal */
+    --gais-glow: 217 91% 60%;
   }
 
   .dark {
-    /* ── Backgrounds ── */
-    --background: 222 47% 6%;              /* #0B1120 deep navy */
-    --foreground: 210 20% 96%;             /* #F3F4F6 off-white */
-    --card: 222 40% 9%;                    /* #111827 dark card */
-    --card-foreground: 210 20% 96%;
-    --popover: 222 40% 9%;
-    --popover-foreground: 210 20% 96%;
+    /* ── Backgrounds — Deep Space ── */
+    --background: 222 47% 5%;              /* #080E1C ultra deep navy */
+    --foreground: 214 32% 91%;             /* #DDE4EE soft white */
+    --card: 222 44% 8%;                    /* #0D1526 */
+    --card-foreground: 214 32% 91%;
+    --popover: 222 44% 8%;
+    --popover-foreground: 214 32% 91%;
 
-    /* ── Primary — Signal Blue ── */
-    --primary: 217 91% 60%;               /* #3B82F6 brighter blue for dark */
+    /* ── Primary — Electric Blue ── */
+    --primary: 217 91% 60%;               /* #3B82F6 */
     --primary-foreground: 0 0% 100%;
 
     /* ── Secondary ── */
-    --secondary: 217 33% 14%;             /* #1E293B slate */
-    --secondary-foreground: 210 20% 96%;
+    --secondary: 217 33% 14%;             /* #1E293B */
+    --secondary-foreground: 214 32% 91%;
 
     /* ── Muted ── */
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 16% 56%;      /* #8B95A5 */
+    --muted: 217 33% 12%;
+    --muted-foreground: 215 16% 57%;      /* #8B95A5 */
 
     /* ── Accent ── */
     --accent: 217 33% 17%;
-    --accent-foreground: 210 20% 96%;
+    --accent-foreground: 214 32% 91%;
 
     /* ── Status ── */
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --success: 142 71% 45%;
     --warning: 38 92% 50%;
     --info: 199 89% 48%;
 
     /* ── Borders & Inputs ── */
-    --border: 217 33% 18%;                /* dark border */
+    --border: 217 33% 17%;
     --input: 217 33% 14%;
     --ring: 217 91% 60%;
 
     /* ── Sidebar ── */
-    --sidebar-background: 222 47% 6%;
-    --sidebar-foreground: 215 16% 70%;
+    --sidebar-background: 222 47% 5%;
+    --sidebar-foreground: 215 16% 65%;
     --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 217 33% 14%;
-    --sidebar-accent-foreground: 210 20% 96%;
-    --sidebar-border: 217 33% 18%;
+    --sidebar-accent-foreground: 214 32% 91%;
+    --sidebar-border: 217 33% 17%;
     --sidebar-ring: 217 91% 60%;
 
     /* ── Charts ── */
@@ -118,6 +123,11 @@
     --chart-3: 38 92% 50%;
     --chart-4: 271 81% 56%;
     --chart-5: 142 71% 45%;
+
+    /* ── GAIS Custom ── */
+    --gais-gradient-start: 217 91% 60%;
+    --gais-gradient-end: 192 91% 52%;
+    --gais-glow: 217 91% 60%;
   }
 
   * {
@@ -128,39 +138,84 @@
   *::-webkit-scrollbar { width: 5px; height: 5px; background: transparent; }
   *::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
 
-  html { direction: rtl; }
+  html { direction: rtl; scroll-behavior: smooth; }
 
   body {
     @apply bg-background text-foreground;
     font-family: 'Cairo', 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
     font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
-    line-height: 1.6;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.7;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cairo', 'Tajawal', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.3;
     @apply text-balance;
   }
+
+  /* Smooth theme transition */
+  body, .card, header, footer, nav, main {
+    transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease;
+  }
 }
 
-/* ─── Utilities ────────────────────────────────────────────────────────── */
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
 @layer utilities {
+  /* Gradient Text */
   .gradient-text {
-    background: linear-gradient(135deg, hsl(221,83%,53%) 0%, hsl(199,89%,48%) 100%);
+    background: linear-gradient(135deg, hsl(var(--gais-gradient-start)) 0%, hsl(var(--gais-gradient-end)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
+  /* Animated gradient background */
+  .gradient-bg {
+    background: linear-gradient(135deg,
+      hsl(222 47% 5%) 0%,
+      hsl(222 44% 10%) 30%,
+      hsl(217 40% 12%) 60%,
+      hsl(222 47% 5%) 100%
+    );
+  }
+  .dark .gradient-bg {
+    background: linear-gradient(135deg,
+      hsl(222 47% 4%) 0%,
+      hsl(222 44% 8%) 30%,
+      hsl(217 40% 10%) 60%,
+      hsl(222 47% 4%) 100%
+    );
+  }
+
+  /* Glow effects */
+  .glow-blue {
+    box-shadow: 0 0 20px hsl(var(--gais-glow) / 0.15), 0 0 60px hsl(var(--gais-glow) / 0.05);
+  }
+  .glow-ring {
+    box-shadow: 0 0 0 1px hsl(var(--gais-glow) / 0.2), 0 0 20px hsl(var(--gais-glow) / 0.1);
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  }
+  .dark .glass {
+    background: hsl(var(--background) / 0.6);
+  }
+
+  /* Card hover */
   .card-hover {
-    transition: box-shadow 0.18s ease, border-color 0.18s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
   .card-hover:hover {
-    border-color: hsl(var(--primary) / 0.2);
-    box-shadow: 0 2px 12px hsl(var(--primary) / 0.06);
+    transform: translateY(-2px);
+    border-color: hsl(var(--primary) / 0.25);
+    box-shadow: 0 8px 30px hsl(var(--primary) / 0.08);
   }
 
   .stat-card {
@@ -168,24 +223,43 @@
     border: 1px solid hsl(var(--border));
   }
 
-  .status-pending {
-    @apply bg-warning/10 text-warning border border-warning/20;
+  /* Status badges */
+  .status-pending { @apply bg-warning/10 text-warning border border-warning/20; }
+  .status-active { @apply bg-success/10 text-success border border-success/20; }
+  .status-rejected { @apply bg-destructive/10 text-destructive border border-destructive/20; }
+  .status-expired { @apply bg-muted text-muted-foreground border border-border; }
+  .status-info { @apply bg-info/10 text-info border border-info/20; }
+
+  /* Number styling (LTR) */
+  .ltr-number { direction: ltr; unicode-bidi: embed; }
+
+  /* Subtle floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
   }
-  .status-active {
-    @apply bg-success/10 text-success border border-success/20;
+  .animate-float { animation: float 4s ease-in-out infinite; }
+
+  /* Pulse glow */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+    50% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
   }
-  .status-rejected {
-    @apply bg-destructive/10 text-destructive border border-destructive/20;
+  .animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+  /* Shimmer loading */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
-  .status-expired {
-    @apply bg-muted text-muted-foreground border border-border;
-  }
-  .status-info {
-    @apply bg-info/10 text-info border border-info/20;
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 33%, hsl(var(--primary) / 0.08) 50%, transparent 67%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
   }
 }
 
-/* ─── Component helpers ─────────────────────────────────────────────────── */
+/* ─── Component helpers ──────────────────────────────────────────────────── */
 @layer components {
   .nav-item-active {
     @apply bg-primary/8 text-primary font-medium;
@@ -194,6 +268,37 @@
     @apply text-muted-foreground hover:bg-muted hover:text-foreground transition-colors duration-150 rounded-md;
   }
   .admin-stat-icon {
-    @apply rounded-lg p-2.5 flex items-center justify-center;
+    @apply rounded-xl p-3 flex items-center justify-center;
+  }
+
+  /* Section styling */
+  .section-title {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold text-foreground text-center;
+  }
+  .section-subtitle {
+    @apply text-base md:text-lg text-muted-foreground text-center max-w-2xl mx-auto mt-3;
+  }
+
+  /* WhatsApp floating button */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 999;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(37, 211, 102, 0.5);
   }
 }

@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import WhatsAppFloat from '@/components/common/WhatsAppFloat';
 
 interface PublicLayoutProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 }

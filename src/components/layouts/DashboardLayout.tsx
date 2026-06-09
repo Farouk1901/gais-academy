@@ -10,6 +10,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import Navbar from './Navbar';
+import WhatsAppFloat from '@/components/common/WhatsAppFloat';
 
 const studentNavItems = [
   { label: 'لوحة التحكم', icon: LayoutDashboard, href: '/dashboard' },
@@ -121,40 +123,44 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-sidebar border-l border-sidebar-border">
-        <SidebarContent />
-      </aside>
+    <div className="min-h-screen bg-background" dir="rtl">
+      <Navbar />
+      <div className="flex w-full">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-sidebar border-l border-sidebar-border min-h-[calc(100vh-4rem)] sticky top-16">
+          <SidebarContent />
+        </aside>
 
-      {/* Main */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-40">
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-72 bg-sidebar p-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileOpen(false)}
-                className="absolute top-3 left-3 text-sidebar-foreground hover:bg-sidebar-accent"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <SidebarContent onClose={() => setMobileOpen(false)} />
-            </SheetContent>
-          </Sheet>
-          <span className="text-sm font-semibold text-foreground">لوحة الطالب</span>
-          <div className="w-9" />
-        </header>
+        {/* Main */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Mobile Header */}
+          <header className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border bg-background/95 backdrop-blur-md sticky top-16 z-40">
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-72 bg-sidebar p-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileOpen(false)}
+                  className="absolute top-3 left-3 text-sidebar-foreground hover:bg-sidebar-accent"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <SidebarContent onClose={() => setMobileOpen(false)} />
+              </SheetContent>
+            </Sheet>
+            <span className="text-sm font-semibold text-foreground">لوحة الطالب</span>
+            <div className="w-9" />
+          </header>
 
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-6">{children}</main>
+        </div>
       </div>
+      <WhatsAppFloat />
     </div>
   );
 }

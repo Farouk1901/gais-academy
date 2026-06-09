@@ -26,7 +26,6 @@ export default function ContactPage() {
         phone: form.phone.trim() || null,
         subject: form.subject.trim() || 'رسالة تواصل',
         message: form.message.trim(),
-        status: 'new',
       });
       if (error) {
         console.error('Supabase insert error:', error);

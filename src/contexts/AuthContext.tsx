@@ -3,6 +3,8 @@ import { supabase } from '@/db/supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/types/types';
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
@@ -13,7 +15,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return data;
 }
 
-// Log admin activity
+/** Log admin activity */
 export async function logActivity(
   adminId: string,
   action: string,
@@ -30,7 +32,7 @@ export async function logActivity(
   });
 }
 
-// Translate Supabase Auth error codes to Arabic
+/** Translate Supabase Auth error codes to Arabic */
 export function translateAuthError(message: string): string {
   if (!message) return 'حدث خطأ غير متوقع';
   const m = message.toLowerCase();
@@ -40,23 +42,27 @@ export function translateAuthError(message: string): string {
     return 'البريد الإلكتروني غير مُفعَّل، يرجى التحقق من بريدك';
   if (m.includes('user not found'))
     return 'لا يوجد حساب بهذا البريد الإلكتروني';
-  if (m.includes('too many requests') || m.includes('rate limit'))
+  if (m.includes('too many requests') || m.includes('rate limit') || m.includes('429'))
     return 'محاولات كثيرة، يرجى الانتظار قليلاً ثم المحاولة مجدداً';
   if (m.includes('network') || m.includes('fetch'))
     return 'تعذّر الاتصال بالخادم، تحقق من اتصالك بالإنترنت';
-  if (m.includes('email already') || m.includes('already registered'))
+  if (m.includes('email already') || m.includes('already registered') || m.includes('مسجَّل'))
     return 'هذا البريد الإلكتروني مسجَّل مسبقاً';
   if (m.includes('password') && m.includes('short'))
     return 'كلمة المرور قصيرة جداً (6 أحرف على الأقل)';
+  if (m.includes('signup') && m.includes('disabled'))
+    return 'التسجيل متوقف حالياً، يرجى المحاولة لاحقاً';
   return 'حدث خطأ، يرجى المحاولة مرة أخرى';
 }
+
+// ─── Context ──────────────────────────────────────────────────────────────────
 
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null; role: string | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   isAdmin: boolean;
@@ -69,18 +75,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  // loading = true only during the very first session check
   const [loading, setLoading] = useState(true);
-  // profileLoaded tracks whether we've attempted to load the profile for the current user
-  // prevents RouteGuard from spinning forever when profile row is missing
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
-
-  // Tracks whether the getSession initial-load path is currently in progress.
-  // Prevents onAuthStateChange SIGNED_IN from resetting profileLoaded while
-  // getSession is already mid-load — which would orphan the load with no safety timer.
   const initialSessionInProgress = useRef(false);
 
+  // ── Load role/user permissions ──────────────────────────────────────────────
   const loadPermissions = async (userId: string, role: string) => {
     try {
       const { data: rolePerm } = await supabase
@@ -99,26 +99,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       setUserPermissions(Array.from(granted));
     } catch {
-      // Non-fatal: permissions default to empty
       setUserPermissions([]);
     }
   };
 
+  // ── Load user profile ───────────────────────────────────────────────────────
   const loadUserProfile = async (userId: string) => {
-    // Per-call safety timer: if this load hangs for any reason (network, RLS issue,
-    // etc.) the UI is unblocked within 5 s.  This is essential because the global
-    // safetyTimer in useEffect is cleared by getSession.finally — meaning any
-    // subsequent loadUserProfile call triggered by onAuthStateChange has NO fallback
-    // without this per-call guard.
     const perCallTimer = setTimeout(() => setProfileLoaded(true), 5000);
     try {
       const profileData = await getProfile(userId);
       setProfile(profileData);
       if (profileData) await loadPermissions(userId, profileData.role);
     } catch (err) {
-      // Do NOT clear profile on refresh errors — a network hiccup during
-      // TOKEN_REFRESHED should not silently log admins/users out.
-      // Only log the error for debugging.
       console.warn('loadUserProfile error (profile preserved):', err);
     } finally {
       clearTimeout(perCallTimer);
@@ -131,13 +123,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadUserProfile(user.id);
   };
 
+  // ── Session bootstrap ───────────────────────────────────────────────────────
   useEffect(() => {
-    // Resolve initial session then mark global loading done.
-    // Safety timeout: if Supabase hangs, never leave RouteGuard stuck on spinner.
     const safetyTimer = setTimeout(() => {
       setLoading(false);
       setProfileLoaded(true);
-    }, 3000); // 3 s is enough: getSession + getProfile should complete well within that
+    }, 3000);
 
     initialSessionInProgress.current = true;
     supabase.auth.getSession()
@@ -160,16 +151,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         if (event === 'SIGNED_IN') {
-          // Skip if getSession is already handling the initial profile load.
           if (initialSessionInProgress.current) return;
           setProfileLoaded(false);
           await loadUserProfile(session.user.id);
         } else if (event === 'TOKEN_REFRESHED') {
-          // Token refreshed — user is already loaded, no need to re-fetch profile
-          // This prevents admin dashboard from re-rendering/redirecting on token refresh
+          // No-op: avoid unnecessary re-renders on token refresh
           return;
         } else {
-          // Other events (USER_UPDATED, etc.) — refresh profile silently
           await loadUserProfile(session.user.id);
         }
       } else {
@@ -183,11 +171,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Sign In ─────────────────────────────────────────────────────────────────
   const signIn = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      // Fetch role immediately so callers can redirect based on role
       const userId = data.user?.id;
       let role: string | null = null;
       if (userId) {
@@ -200,67 +188,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  // ── Sign Up ─────────────────────────────────────────────────────────────────
+  // Flow:
+  //   1. supabase.auth.signUp creates the user in auth.users
+  //   2. The DB trigger `on_auth_user_created` (SECURITY DEFINER) auto-creates
+  //      a row in public.profiles with role='user', reading full_name & phone
+  //      from raw_user_meta_data.
+  //   3. Since email confirmation is OFF, the user is immediately authenticated.
+  //   4. We do NOT attempt any client-side INSERT/UPSERT — the trigger handles it.
+  const signUp = async (email: string, password: string, fullName: string, phone?: string) => {
     try {
+      const metadata: Record<string, string> = { full_name: fullName };
+      if (phone) metadata.phone = phone;
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
-          emailRedirectTo: window.location.origin + '/login',
+          data: metadata,
+          emailRedirectTo: window.location.origin + '/dashboard',
         },
       });
       if (error) throw error;
 
-      // Supabase may return a user with identities=[] when email confirmation is
-      // required and the email is already registered. Treat that as an error.
+      // Detect duplicate email (Supabase returns empty identities for existing emails)
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         throw new Error('هذا البريد الإلكتروني مسجَّل مسبقاً');
       }
 
-      if (data.user) {
-        // Try to set the name on the profile — this may fail if email is not yet confirmed
-        // (RLS blocks unconfirmed users). The trigger should handle it via user_metadata.
-        const { error: profileError } = await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: data.user.email,
-          full_name: fullName,
-          role: 'user',
-        }, { onConflict: 'id' });
-
-        if (profileError) {
-          console.warn('Profile upsert deferred (email not yet confirmed):', profileError.message);
-        }
-      }
       return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
   };
 
+  // ── Sign Out ────────────────────────────────────────────────────────────────
   const signOut = async () => {
     try {
-      // Clear local state immediately so UI updates before Supabase responds
       setUser(null);
       setProfile(null);
       setUserPermissions([]);
       setProfileLoaded(true);
       await supabase.auth.signOut();
     } catch (err) {
-      // Even if signOut call fails, local state is already cleared — user is "logged out" locally
       console.warn('signOut error (ignored):', err);
     }
   };
 
+  // ── Derived state ───────────────────────────────────────────────────────────
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   const isSuperAdmin = profile?.role === 'super_admin';
-
   const canAccess = (permission: string): boolean => {
     if (isSuperAdmin) return true;
     return userPermissions.includes(permission);
   };
-
-  // Expose a combined loading flag: true while initial session resolves OR profile not yet fetched
   const isLoading = loading || (user !== null && !profileLoaded);
 
   return (
@@ -279,6 +260,3 @@ export function useAuth() {
   if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 }
-
-
-

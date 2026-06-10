@@ -12,26 +12,45 @@ import { toast } from 'sonner';
 export default function RegisterPage() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '', phone: '' });
   const [showPass, setShowPass] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.fullName || !form.email || !form.password) { toast.error('يرجى تعبئة جميع الحقول'); return; }
-    if (form.password.length < 6) { toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
-    if (form.password !== form.confirmPassword) { toast.error('كلمتا المرور غير متطابقتين'); return; }
-    if (!agreed) { toast.error('يجب الموافقة على شروط الاستخدام وسياسة الخصوصية'); return; }
+    // ── Validation ──
+    if (!form.fullName.trim() || !form.email.trim() || !form.password) {
+      toast.error('يرجى تعبئة جميع الحقول المطلوبة');
+      return;
+    }
+    if (form.password.length < 6) {
+      toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      toast.error('كلمتا المرور غير متطابقتين');
+      return;
+    }
+    if (!agreed) {
+      toast.error('يجب الموافقة على شروط الاستخدام وسياسة الخصوصية');
+      return;
+    }
+
     setLoading(true);
-    const { error } = await signUp(form.email.trim(), form.password, form.fullName.trim());
+    const { error } = await signUp(
+      form.email.trim(),
+      form.password,
+      form.fullName.trim(),
+      form.phone.trim() || undefined
+    );
+    setLoading(false);
+
     if (error) {
-      setLoading(false);
       toast.error(translateAuthError(error.message));
     } else {
-      setLoading(false);
-      toast.success('تم إنشاء حسابك بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب', { duration: 8000 });
-      navigate('/login');
+      toast.success('تم إنشاء حسابك بنجاح! مرحباً بك في أكاديمية الجوهري 🎉', { duration: 5000 });
+      navigate('/dashboard', { replace: true });
     }
   };
 
@@ -98,8 +117,9 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Full Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="fullName" className="text-sm font-normal text-muted-foreground">الاسم الكامل</Label>
+              <Label htmlFor="fullName" className="text-sm font-normal text-muted-foreground">الاسم الكامل *</Label>
               <Input
                 id="fullName"
                 placeholder="محمد أحمد"
@@ -107,11 +127,13 @@ export default function RegisterPage() {
                 onChange={e => setForm(p => ({ ...p, fullName: e.target.value }))}
                 className="bg-card border-border h-11 px-3"
                 autoComplete="name"
+                required
               />
             </div>
 
+            {/* Email */}
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-normal text-muted-foreground">البريد الإلكتروني</Label>
+              <Label htmlFor="email" className="text-sm font-normal text-muted-foreground">البريد الإلكتروني *</Label>
               <Input
                 id="email"
                 type="email"
@@ -121,11 +143,28 @@ export default function RegisterPage() {
                 className="bg-card border-border h-11 px-3 font-inter"
                 dir="ltr"
                 autoComplete="email"
+                required
               />
             </div>
 
+            {/* Phone (optional) */}
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-normal text-muted-foreground">كلمة المرور</Label>
+              <Label htmlFor="phone" className="text-sm font-normal text-muted-foreground">رقم الهاتف (اختياري)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="01xxxxxxxxx"
+                value={form.phone}
+                onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                className="bg-card border-border h-11 px-3 font-inter"
+                dir="ltr"
+                autoComplete="tel"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-normal text-muted-foreground">كلمة المرور *</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -136,6 +175,7 @@ export default function RegisterPage() {
                   className="bg-card border-border h-11 px-3 pe-10 font-inter"
                   dir="ltr"
                   autoComplete="new-password"
+                  required
                 />
                 <button
                   type="button"
@@ -148,8 +188,9 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Confirm Password */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-sm font-normal text-muted-foreground">تأكيد كلمة المرور</Label>
+              <Label htmlFor="confirmPassword" className="text-sm font-normal text-muted-foreground">تأكيد كلمة المرور *</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -159,9 +200,11 @@ export default function RegisterPage() {
                 className="bg-card border-border h-11 px-3 font-inter"
                 dir="ltr"
                 autoComplete="new-password"
+                required
               />
             </div>
 
+            {/* Terms */}
             <div className="flex items-start gap-2.5 py-1">
               <Checkbox
                 id="terms"
@@ -206,7 +249,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-
-
-

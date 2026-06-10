@@ -26,7 +26,7 @@ const STATUS_CLASS: Record<string, string> = {
 };
 const STATUS_LABELS: Record<string, string> = { published: 'منشور', draft: 'مسودة', unpublished: 'غير منشور' };
 
-const emptyForm = { title_ar: '', title_en: '', description_ar: '', description_en: '', level: 'beginner' as CourseLevel, price: 0, discount_price: 0, duration_hours: 0, cover_image_url: '', category: '', requirements: '', outcomes: '', target_audience: '', is_featured: false, is_free: false };
+const emptyForm = { title_ar: '', title_en: '', description_ar: '', description_en: '', level: 'beginner' as CourseLevel, price: 0, discount_price: 0, duration_hours: 0, cover_image_url: '', thumbnail_url: '', category: '', requirements: '', outcomes: '', target_audience: '', is_featured: false, is_free: false };
 
 type CourseWithCount = Course & { enrollments?: { count: number }[]; lessons?: { count: number }[] };
 
@@ -65,7 +65,7 @@ export default function AdminCoursesPage() {
   const openCreate = () => { setForm(emptyForm); setSelected(null); setDialogType('create'); };
   const openEdit = (c: CourseWithCount) => {
     setSelected(c);
-    setForm({ title_ar: c.title_ar || '', title_en: c.title_en || '', description_ar: c.description_ar || '', description_en: c.description_en || '', level: c.level || 'beginner', price: c.price || 0, discount_price: c.discount_price || 0, duration_hours: c.duration_hours || 0, cover_image_url: c.cover_image_url || '', category: c.category || '', requirements: (c.requirements as string[])?.join('\n') || '', outcomes: (c.learning_outcomes as string[])?.join('\n') || '', target_audience: (c.target_audience as string[])?.join('\n') || '', is_featured: c.is_featured || false, is_free: c.is_free || false });
+    setForm({ title_ar: c.title_ar || '', title_en: c.title_en || '', description_ar: c.description_ar || '', description_en: c.description_en || '', level: c.level || 'beginner', price: c.price || 0, discount_price: c.discount_price || 0, duration_hours: c.duration_hours || 0, cover_image_url: c.cover_image_url || '', thumbnail_url: c.thumbnail_url || '', category: c.category || '', requirements: (c.requirements as string[])?.join('\n') || '', outcomes: (c.learning_outcomes as string[])?.join('\n') || '', target_audience: (c.target_audience as string[])?.join('\n') || '', is_featured: c.is_featured || false, is_free: c.is_free || false });
     setDialogType('edit');
   };
 
@@ -74,6 +74,7 @@ export default function AdminCoursesPage() {
     if (!form.title_ar.trim()) { toast.error('العنوان العربي مطلوب'); return; }
     setActionLoading(true);
     // Only include columns that actually exist in the DB schema
+    // Use empty arrays [] instead of null to avoid NOT NULL constraint violations
     const payload = {
       title_ar: form.title_ar,
       description_ar: form.description_ar || null,
@@ -82,10 +83,12 @@ export default function AdminCoursesPage() {
       discount_price: Number(form.discount_price) || null,
       duration_hours: Number(form.duration_hours) || null,
       cover_image_url: form.cover_image_url || null,
+      thumbnail_url: form.thumbnail_url || null,
       category: form.category || null,
-      requirements: form.requirements ? form.requirements.split('\n').filter(Boolean) : null,
-      learning_outcomes: form.outcomes ? form.outcomes.split('\n').filter(Boolean) : null,
-      target_audience: form.target_audience ? form.target_audience.split('\n').filter(Boolean) : null,
+      requirements: form.requirements ? form.requirements.split('\n').filter(Boolean) : [],
+      learning_outcomes: form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [],
+      target_audience: form.target_audience ? form.target_audience.split('\n').filter(Boolean) : [],
+      what_you_learn: form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [],
       is_featured: form.is_featured,
       is_free: form.is_free,
     };
@@ -245,7 +248,38 @@ export default function AdminCoursesPage() {
                 <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">السعر (ج.م)</Label><Input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: Number(e.target.value) }))} className="bg-input border-border" /></div>
                 <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">سعر الخصم (ج.م)</Label><Input type="number" value={form.discount_price} onChange={e => setForm(p => ({ ...p, discount_price: Number(e.target.value) }))} className="bg-input border-border" /></div>
                 <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">مدة الكورس (ساعات)</Label><Input type="number" value={form.duration_hours} onChange={e => setForm(p => ({ ...p, duration_hours: Number(e.target.value) }))} className="bg-input border-border" /></div>
-                <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">صورة الغلاف (URL)</Label><Input value={form.cover_image_url} onChange={e => setForm(p => ({ ...p, cover_image_url: e.target.value }))} className="bg-input border-border" /></div>
+              </div>
+              {/* Course Images Section */}
+              <div className="p-3 rounded-lg bg-secondary/30 border border-border space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">صور الكورس</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-normal text-muted-foreground">صورة الغلاف (Cover Image URL)</Label>
+                    <Input value={form.cover_image_url} onChange={e => setForm(p => ({ ...p, cover_image_url: e.target.value }))} placeholder="https://..." className="bg-input border-border" dir="ltr" />
+                    <p className="text-[10px] text-muted-foreground">📐 المقاس الموصى: <span className="text-foreground font-medium">1920×1080px</span> (نسبة 16:9) — تظهر في صفحة تفاصيل الكورس</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-normal text-muted-foreground">صورة مصغرة (Thumbnail URL)</Label>
+                    <Input value={form.thumbnail_url} onChange={e => setForm(p => ({ ...p, thumbnail_url: e.target.value }))} placeholder="https://..." className="bg-input border-border" dir="ltr" />
+                    <p className="text-[10px] text-muted-foreground">📐 المقاس الموصى: <span className="text-foreground font-medium">640×360px</span> (نسبة 16:9) — تظهر في بطاقات الكورسات</p>
+                  </div>
+                </div>
+                {(form.cover_image_url || form.thumbnail_url) && (
+                  <div className="flex gap-3 mt-2">
+                    {form.cover_image_url && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground">معاينة الغلاف:</p>
+                        <img src={form.cover_image_url} alt="cover" className="w-32 h-18 object-cover rounded border border-border" onError={e => (e.currentTarget.style.display = 'none')} />
+                      </div>
+                    )}
+                    {form.thumbnail_url && (
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-muted-foreground">معاينة المصغرة:</p>
+                        <img src={form.thumbnail_url} alt="thumbnail" className="w-24 h-14 object-cover rounded border border-border" onError={e => (e.currentTarget.style.display = 'none')} />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">المتطلبات (سطر لكل متطلب)</Label><Textarea value={form.requirements} onChange={e => setForm(p => ({ ...p, requirements: e.target.value }))} className="bg-input border-border resize-none" rows={3} /></div>
               <div className="space-y-1.5"><Label className="text-sm font-normal text-muted-foreground">ماذا سيتعلم الطالب (سطر لكل نقطة)</Label><Textarea value={form.outcomes} onChange={e => setForm(p => ({ ...p, outcomes: e.target.value }))} className="bg-input border-border resize-none" rows={3} /></div>

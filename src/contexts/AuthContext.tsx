@@ -202,7 +202,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: window.location.origin + '/login',
+        },
+      });
       if (error) throw error;
 
       // Supabase may return a user with identities=[] when email confirmation is
@@ -212,7 +219,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
-        // The trigger should have created the profile row, but upsert as a safety net
+        // Try to set the name on the profile — this may fail if email is not yet confirmed
+        // (RLS blocks unconfirmed users). The trigger should handle it via user_metadata.
         const { error: profileError } = await supabase.from('profiles').upsert({
           id: data.user.id,
           email: data.user.email,
@@ -221,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }, { onConflict: 'id' });
 
         if (profileError) {
-          console.warn('Profile upsert failed (non-fatal):', profileError.message);
+          console.warn('Profile upsert deferred (email not yet confirmed):', profileError.message);
         }
       }
       return { error: null };

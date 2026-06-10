@@ -29,8 +29,9 @@ export default function RegisterPage() {
       setLoading(false);
       toast.error(translateAuthError(error.message));
     } else {
-      toast.success('تم إنشاء حسابك بنجاح! مرحباً بك في GAIS');
-      navigate('/dashboard');
+      setLoading(false);
+      toast.success('تم إنشاء حسابك بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب', { duration: 8000 });
+      navigate('/login');
     }
   };
 

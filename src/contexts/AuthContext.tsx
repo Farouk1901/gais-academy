@@ -161,14 +161,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         if (event === 'SIGNED_IN') {
           // Skip if getSession is already handling the initial profile load.
-          // Without this guard, onAuthStateChange fires SIGNED_IN for existing sessions
-          // right after getSession resolves, resets profileLoaded=false, and triggers a
-          // second loadUserProfile — but the global safetyTimer was already cleared by
-          // getSession.finally, so if this second load hangs, isLoading stays true forever.
           if (initialSessionInProgress.current) return;
           setProfileLoaded(false);
+          await loadUserProfile(session.user.id);
+        } else if (event === 'TOKEN_REFRESHED') {
+          // Token refreshed — user is already loaded, no need to re-fetch profile
+          // This prevents admin dashboard from re-rendering/redirecting on token refresh
+          return;
+        } else {
+          // Other events (USER_UPDATED, etc.) — refresh profile silently
+          await loadUserProfile(session.user.id);
         }
-        await loadUserProfile(session.user.id);
       } else {
         setProfile(null);
         setUserPermissions([]);

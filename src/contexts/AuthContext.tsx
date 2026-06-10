@@ -239,7 +239,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   const isSuperAdmin = profile?.role === 'super_admin';
   const canAccess = (permission: string): boolean => {
-    if (isSuperAdmin) return true;
+    // Admin and Super Admin have identical full access
+    if (isAdmin) return true;
     return userPermissions.includes(permission);
   };
   const isLoading = loading || (user !== null && !profileLoaded);

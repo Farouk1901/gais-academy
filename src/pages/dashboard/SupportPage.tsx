@@ -182,7 +182,7 @@ export default function SupportPage() {
                         id: string; message: string; created_at: string;
                         profiles?: { full_name: string; role: string };
                       };
-                      const isAdmin = r.profiles?.role === 'admin';
+                      const isAdmin = r.profiles?.role === 'admin' || r.profiles?.role === 'super_admin';
                       return (
                         <div key={r.id} className={`p-3 rounded-lg ${isAdmin ? 'bg-primary/5 border border-primary/10' : 'bg-muted/30'}`}>
                           <div className="flex items-center gap-2 mb-1">

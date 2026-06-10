@@ -28,7 +28,7 @@ const ROLE_ICON: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 export default function AdminUsersPage() {
-  const { profile: myProfile, isSuperAdmin } = useAuth();
+  const { profile: myProfile, isAdmin } = useAuth();
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -70,8 +70,8 @@ export default function AdminUsersPage() {
   const saveUser = async () => {
     if (!selected || !myProfile) return;
     // Only super_admin can assign super_admin or admin roles
-    if ((formData.role === 'super_admin' || formData.role === 'admin') && !isSuperAdmin) {
-      toast.error('فقط Super Admin يمكنه تعيين هذا الدور');
+    if ((formData.role === 'super_admin' || formData.role === 'admin') && !isAdmin) {
+      toast.error('فقط المديرين يمكنهم تعيين هذا الدور');
       return;
     }
     setActionLoading(true);
@@ -222,8 +222,8 @@ export default function AdminUsersPage() {
               <Select value={formData.role} onValueChange={v => setFormData(p => ({ ...p, role: v as UserRole }))}>
                 <SelectTrigger className="bg-input border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {isSuperAdmin && <SelectItem value="super_admin">Super Admin</SelectItem>}
-                  {isSuperAdmin && <SelectItem value="admin">مدير</SelectItem>}
+                  {isAdmin && <SelectItem value="super_admin">Super Admin</SelectItem>}
+                  {isAdmin && <SelectItem value="admin">مدير</SelectItem>}
                   <SelectItem value="instructor">محاضر</SelectItem>
                   <SelectItem value="user">طالب</SelectItem>
                 </SelectContent>

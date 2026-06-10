@@ -17,7 +17,7 @@ const ROLES = [
 ];
 
 export default function AdminRolesPage() {
-  const { isSuperAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [rolePerms, setRolePerms] = useState<Record<string, Set<string>>>({});
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ export default function AdminRolesPage() {
   useEffect(() => { fetchData(); }, []);
 
   const togglePermission = (role: string, key: string) => {
-    if (!isSuperAdmin) { toast.error('فقط Super Admin يمكنه تعديل الصلاحيات'); return; }
+    if (!isAdmin) { toast.error('فقط المديرين يمكنهم تعديل الصلاحيات'); return; }
     setRolePerms(prev => {
       const updated = { ...prev };
       const set = new Set(prev[role] || []);
@@ -61,7 +61,7 @@ export default function AdminRolesPage() {
   };
 
   const saveRole = async (role: string) => {
-    if (!isSuperAdmin) { toast.error('فقط Super Admin يمكنه تعديل الصلاحيات'); return; }
+    if (!isAdmin) { toast.error('فقط المديرين يمكنهم تعديل الصلاحيات'); return; }
     setSaving(role);
     try {
       await supabase.from('role_permissions').delete().eq('role', role);
@@ -99,15 +99,15 @@ export default function AdminRolesPage() {
           <Crown className="w-5 h-5 text-warning shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-medium text-warning font-cairo">Super Admin</p>
-            <p className="text-xs text-muted-foreground mt-0.5">يملك جميع الصلاحيات تلقائياً ولا يمكن تقييده. فقط Super Admin يمكنه تعديل هذه الإعدادات.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">يملك جميع الصلاحيات تلقائياً ولا يمكن تقييده. فقط المديرين يمكنهم تعديل هذه الإعدادات.</p>
           </div>
         </CardContent>
       </Card>
 
-      {!isSuperAdmin && (
+      {!isAdmin && (
         <Card className="stat-card border-destructive/20">
           <CardContent className="p-4">
-            <p className="text-sm text-destructive">⚠️ فقط Super Admin يمكنه تعديل الصلاحيات. أنت تشاهد هذه الصفحة للقراءة فقط.</p>
+            <p className="text-sm text-destructive">⚠️ فقط المديرين يمكنهم تعديل الصلاحيات. أنت تشاهد هذه الصفحة للقراءة فقط.</p>
           </CardContent>
         </Card>
       )}
@@ -130,7 +130,7 @@ export default function AdminRolesPage() {
                       <CardDescription className="text-xs">{currentPerms.size} صلاحية مفعّلة</CardDescription>
                     </div>
                   </div>
-                  {isSuperAdmin && (
+                  {isAdmin && (
                     <Button size="sm" onClick={() => saveRole(role.key)} disabled={saving === role.key} className="text-xs h-7 gap-1">
                       <Save className="w-3 h-3" />{saving === role.key ? 'جاري...' : 'حفظ'}
                     </Button>
@@ -149,7 +149,7 @@ export default function AdminRolesPage() {
                             <Switch
                               checked={currentPerms.has(perm.key)}
                               onCheckedChange={() => togglePermission(role.key, perm.key)}
-                              disabled={!isSuperAdmin}
+                              disabled={!isAdmin}
                             />
                           </div>
                         ))}

@@ -201,8 +201,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
+
+      // Supabase may return a user with identities=[] when email confirmation is
+      // required and the email is already registered. Treat that as an error.
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error('هذا البريد الإلكتروني مسجَّل مسبقاً');
+      }
+
       if (data.user) {
-        await supabase.from('profiles').update({ full_name: fullName }).eq('id', data.user.id);
+        // The trigger should have created the profile row, but upsert as a safety net
+        const { error: profileError } = await supabase.from('profiles').upsert({
+          id: data.user.id,
+          email: data.user.email,
+          full_name: fullName,
+          role: 'user',
+        }, { onConflict: 'id' });
+
+        if (profileError) {
+          console.warn('Profile upsert failed (non-fatal):', profileError.message);
+        }
       }
       return { error: null };
     } catch (error) {

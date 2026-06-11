@@ -73,28 +73,38 @@ export default function AdminCoursesPage() {
     if (!profile) return;
     if (!form.title_ar.trim()) { toast.error('العنوان العربي مطلوب'); return; }
     setActionLoading(true);
-    // Only include columns that actually exist in the DB schema
-    // Use empty arrays [] instead of null to avoid NOT NULL constraint violations
+    // Build payload matching EXACT DB schema
+    // NOT NULL columns: id(auto), title, title_ar, price(default 0), level(default beginner),
+    //   status(default draft), created_at(auto), updated_at(auto), is_free(default), is_featured(default),
+    //   learning_outcomes(default '{}')
+    const outcomesArr = form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [];
     const payload = {
-      title_ar: form.title_ar,
-      description_ar: form.description_ar || null,
+      title: form.title_en?.trim() || form.title_ar,  // NOT NULL — must always be set
+      title_ar: form.title_ar,                          // NOT NULL — must always be set
+      description: form.description_en || form.description_ar || '',
+      description_ar: form.description_ar || '',
       level: form.level,
-      price: Number(form.price),
+      price: Number(form.price) || 0,
       discount_price: Number(form.discount_price) || null,
       duration_hours: Number(form.duration_hours) || null,
       cover_image_url: form.cover_image_url || null,
       thumbnail_url: form.thumbnail_url || null,
       category: form.category || null,
       requirements: form.requirements ? form.requirements.split('\n').filter(Boolean) : [],
-      learning_outcomes: form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [],
+      learning_outcomes: outcomesArr.length > 0 ? outcomesArr : [],
       target_audience: form.target_audience ? form.target_audience.split('\n').filter(Boolean) : [],
-      what_you_learn: form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [],
+      what_you_learn: outcomesArr.length > 0 ? outcomesArr : [],
       is_featured: form.is_featured,
       is_free: form.is_free,
     };
     try {
       if (dialogType === 'create') {
-        const { error } = await supabase.from('courses').insert({ ...payload, status: 'draft', instructor_id: profile.id });
+        const { error } = await supabase.from('courses').insert({
+          ...payload,
+          status: 'draft',
+          instructor_id: profile.id,
+          instructor_name: profile.full_name || 'أكاديمية الجوهري',
+        });
         if (error) throw new Error(error.message);
         try { await logActivity(profile.id, 'create_course', 'course'); } catch (_) { /* non-critical */ }
         toast.success('تم إنشاء الكورس');

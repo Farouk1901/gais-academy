@@ -74,13 +74,10 @@ export default function AdminCoursesPage() {
     if (!form.title_ar.trim()) { toast.error('العنوان العربي مطلوب'); return; }
     setActionLoading(true);
     // Build payload matching EXACT DB schema
-    // NOT NULL columns: id(auto), title, title_ar, price(default 0), level(default beginner),
-    //   status(default draft), created_at(auto), updated_at(auto), is_free(default), is_featured(default),
-    //   learning_outcomes(default '{}')
     const outcomesArr = form.outcomes ? form.outcomes.split('\n').filter(Boolean) : [];
-    const payload = {
-      title: form.title_en?.trim() || form.title_ar,  // NOT NULL — must always be set
-      title_ar: form.title_ar,                          // NOT NULL — must always be set
+    const payload: Record<string, unknown> = {
+      title: form.title_en?.trim() || form.title_ar,
+      title_ar: form.title_ar,
       description: form.description_en || form.description_ar || '',
       description_ar: form.description_ar || '',
       level: form.level,
@@ -99,28 +96,46 @@ export default function AdminCoursesPage() {
     };
     try {
       if (dialogType === 'create') {
-        const { error } = await supabase.from('courses').insert({
+        const insertPayload = {
           ...payload,
-          status: 'draft',
+          status: 'draft' as const,
           instructor_id: profile.id,
           instructor_name: profile.full_name || 'أكاديمية الجوهري',
-        });
-        if (error) throw new Error(error.message);
-        try { await logActivity(profile.id, 'create_course', 'course'); } catch (_) { /* non-critical */ }
-        toast.success('تم إنشاء الكورس');
+        };
+        console.log('[saveCourse] INSERT payload:', JSON.stringify(insertPayload));
+        const { error } = await supabase.from('courses').insert(insertPayload);
+        if (error) {
+          console.error('[saveCourse] Supabase INSERT error:', error);
+          throw new Error(error.message || error.details || 'Unknown DB error');
+        }
+        // Non-critical activity log — fire and forget
+        supabase.from('admin_activity_logs').insert({
+          admin_id: profile.id, action: 'create_course',
+          entity_type: 'course', entity_id: null, details: {},
+        }).then(() => {}).catch(() => {});
+        toast.success('تم إنشاء الكورس بنجاح ✅');
         setDialogType(null);
         fetchCourses();
       } else if (selected) {
+        console.log('[saveCourse] UPDATE payload:', JSON.stringify(payload));
         const { error } = await supabase.from('courses').update(payload).eq('id', selected.id);
-        if (error) throw new Error(error.message);
-        try { await logActivity(profile.id, 'edit_course', 'course', selected.id); } catch (_) { /* non-critical */ }
-        toast.success('تم تحديث الكورس');
+        if (error) {
+          console.error('[saveCourse] Supabase UPDATE error:', error);
+          throw new Error(error.message || error.details || 'Unknown DB error');
+        }
+        // Non-critical activity log — fire and forget
+        supabase.from('admin_activity_logs').insert({
+          admin_id: profile.id, action: 'edit_course',
+          entity_type: 'course', entity_id: selected.id, details: {},
+        }).then(() => {}).catch(() => {});
+        toast.success('تم تحديث الكورس بنجاح ✅');
         setDialogType(null);
         fetchCourses();
       }
-    } catch (err) {
-      console.error('saveCourse error:', err);
-      toast.error(dialogType === 'create' ? 'فشل في إنشاء الكورس' : 'فشل في تحديث الكورس');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'خطأ غير معروف';
+      console.error('[saveCourse] CAUGHT error:', msg);
+      toast.error(`فشل: ${msg}`);
     } finally {
       setActionLoading(false);
     }
